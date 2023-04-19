@@ -16,24 +16,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.csvapi.LoadHandler;
-import spark.Spark;
 import server.weatherapi.WeatherHandler;
+import spark.Spark;
 
-/**
- * Integration testing for csvapi-related handlers.
- */
+/** Integration testing for csvapi-related handlers. */
 public class HandlerTests {
 
-  /**
-   * Integration testing for csvapi-related handlers.
-   */
-  public class TestHandlerIntegration {
+  /** Integration testing for csvapi-related handlers. */
+  public class TestHandlerIntegration {}
 
-  }
-
-  /**
-   * Before all tests, a server is sparked on port 0 and a root logger is established.
-   */
+  /** Before all tests, a server is sparked on port 0 and a root logger is established. */
   @BeforeAll
   public static void setup_before_everything() {
 
@@ -51,8 +43,7 @@ public class HandlerTests {
    * @throws IOException when error occurs in connection
    */
   private String getQueryResult(HttpURLConnection inURL) throws IOException {
-    BufferedReader in = new BufferedReader(
-        new InputStreamReader(inURL.getInputStream()));
+    BufferedReader in = new BufferedReader(new InputStreamReader(inURL.getInputStream()));
     String inputLine;
     StringBuilder content = new StringBuilder();
     while ((inputLine = in.readLine()) != null) {
@@ -83,9 +74,7 @@ public class HandlerTests {
     Spark.awaitInitialization();
   }
 
-  /**
-   * After each test, gracefully stop the Spark server.
-   */
+  /** After each test, gracefully stop the Spark server. */
   @AfterEach
   public void teardown() {
     Spark.unmap("/loadcsv");
@@ -102,7 +91,7 @@ public class HandlerTests {
    * @return - return the connection
    * @throws IOException thrown when creating URL, calling openConnection(), or connect()
    */
-  static private HttpURLConnection tryRequest(String apiCall) throws IOException {
+  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
     URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
     clientConnection.connect();
@@ -148,10 +137,11 @@ public class HandlerTests {
    */
   @Test
   public void testLoadGeneralHeader() throws IOException {
-    HttpURLConnection loadcsvConnection = tryRequest(
-        "loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=true");
+    HttpURLConnection loadcsvConnection =
+        tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=true");
     String response = this.getQueryResult(loadcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"success\",\"filepath\":\"data/stars/stardata.csv\",\"header\":\"true\"}");
   }
 
@@ -164,8 +154,8 @@ public class HandlerTests {
   public void testLoadNoArgs() throws IOException {
     HttpURLConnection loadcsvConnection = tryRequest("loadcsv");
     String response = this.getQueryResult(loadcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"error_bad_request\",\"message\":\"Filepath not provided!\"}");
+    assertEquals(
+        response, "{\"result\":\"error_bad_request\",\"message\":\"Filepath not provided!\"}");
   }
 
   /**
@@ -177,7 +167,8 @@ public class HandlerTests {
   public void testLoadMalformed() throws IOException {
     HttpURLConnection loadcsvConnection = tryRequest("loadcsv?filepath=notarealfilepath.csv");
     String response = this.getQueryResult(loadcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_datasource\",\"filepath\":\"notarealfilepath.csv\",\"message\":\"File not found\"}");
   }
 
@@ -192,7 +183,8 @@ public class HandlerTests {
     String response1 = this.getQueryResult(loadcsvConnection);
     HttpURLConnection viewcsvConnection = tryRequest("viewcsv?filepath=data%2Fminerals.csv");
     String response = this.getQueryResult(viewcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"success\",\"data\":[[\"Red Beryl\",\"Dark red\",\"7\",\"7000\"],[\"Morganite\",\"Orange\",\"7\",\"300\"],[\"Zultanite\",\"Color-Change\",\"6\",\"400\"],[\"Tsavorite\",\"Green\",\"7\",\"200\"],[\"Opal\",\"Rainbow\",\"5\",\"100\"],[\"Alexandrite\",\"Color-Change\",\"7\",\"300\"],[\"Tanzanite\",\"Purple\",\"8\",\"200\"]]}");
   }
 
@@ -205,8 +197,7 @@ public class HandlerTests {
   public void testViewNoneLoaded() throws IOException {
     HttpURLConnection viewcsvConnection = tryRequest("viewcsv?filepath=data%2Fminerals.csv");
     String response = this.getQueryResult(viewcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"error_bad_request\",\"message\":\"no csv loaded!\"}");
+    assertEquals(response, "{\"result\":\"error_bad_request\",\"message\":\"no csv loaded!\"}");
   }
 
   /**
@@ -219,14 +210,13 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Morganite");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"Morganite,Orange,7,300\"}");
+    assertEquals(response, "{\"result\":\"success\",\"data\":\"Morganite,Orange,7,300\"}");
 
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv"));
     searchcsvConnection = tryRequest("searchcsv?val=Andreas");
     response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
+    assertEquals(
+        response, "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
   }
 
   /**
@@ -239,12 +229,10 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Morganite&colInd=0");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"Morganite,Orange,7,300\"}");
+    assertEquals(response, "{\"result\":\"success\",\"data\":\"Morganite,Orange,7,300\"}");
     searchcsvConnection = tryRequest("searchcsv?val=7000&colInd=3");
     response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"Red Beryl,Dark red,7,7000\"}");
+    assertEquals(response, "{\"result\":\"success\",\"data\":\"Red Beryl,Dark red,7,7000\"}");
   }
 
   /**
@@ -257,12 +245,12 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=True"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Andreas&colName=ProperName");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
+    assertEquals(
+        response, "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
     searchcsvConnection = tryRequest("searchcsv?val=282.43485&colName=X");
     response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
+    assertEquals(
+        response, "{\"result\":\"success\",\"data\":\"1,Andreas,282.43485,0.00449,5.36884\"}");
   }
 
   /**
@@ -274,8 +262,8 @@ public class HandlerTests {
   public void testSearchNoLoaded() throws IOException {
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Andreas&colName=ProperName");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"error_bad_request\",\"message\":\"No CSV file loaded.\"}");
+    assertEquals(
+        response, "{\"result\":\"error_bad_request\",\"message\":\"No CSV file loaded.\"}");
   }
 
   /**
@@ -288,13 +276,16 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Value to search for is missing.\"}");
     response = this.getQueryResult(tryRequest("searchcsv?colInd=2"));
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Value to search for is missing.\"}");
     response = this.getQueryResult(tryRequest("searchcsv?colName=heehee"));
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Value to search for is missing.\"}");
   }
 
@@ -308,7 +299,8 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Value to search for is missing.\"}");
   }
 
@@ -320,10 +312,11 @@ public class HandlerTests {
   @Test
   public void testSearchIndexAndColName() throws IOException {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=True"));
-    HttpURLConnection searchcsvConnection = tryRequest(
-        "searchcsv?val=Andreas&colInd=2&colName=zest");
+    HttpURLConnection searchcsvConnection =
+        tryRequest("searchcsv?val=Andreas&colInd=2&colName=zest");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_json\",\"message\":\"Invalid input: provide column name or column index, not both.\"}");
   }
 
@@ -337,7 +330,8 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Morganite&colName=names");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Column name can only be used when file is loaded with header\"}");
   }
 
@@ -351,8 +345,8 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Morganite&colInd=37");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
-        "{\"result\":\"error_bad_request\",\"message\":\"Column index out of bounds\"}");
+    assertEquals(
+        response, "{\"result\":\"error_bad_request\",\"message\":\"Column index out of bounds\"}");
   }
 
   /**
@@ -365,7 +359,8 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fminerals.csv"));
     HttpURLConnection searchcsvConnection = tryRequest("searchcsv?val=Morganite&colInd=names");
     String response = this.getQueryResult(searchcsvConnection);
-    assertEquals(response,
+    assertEquals(
+        response,
         "{\"result\":\"error_bad_request\",\"message\":\"Column index not parsable to integer\"}");
   }
 
@@ -381,5 +376,4 @@ public class HandlerTests {
     this.getQueryResult(tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv"));
     assertEquals("data/stars/stardata.csv", this.storage.getFilepath());
   }
-
 }

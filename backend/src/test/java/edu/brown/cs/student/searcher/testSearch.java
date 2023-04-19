@@ -19,7 +19,8 @@ public class testSearch {
   @Test
   public void testNoHeader() {
     assertEquals(
-        "Morganite,Orange,7,300", SearchFunction.searchCSV("data/minerals.csv", "0", "Orange", false));
+        "Morganite,Orange,7,300",
+        SearchFunction.searchCSV("data/minerals.csv", "0", "Orange", false));
   }
 
   /**

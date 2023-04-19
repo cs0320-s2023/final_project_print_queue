@@ -20,21 +20,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import server.weatherapi.WeatherCache;
 import server.weatherapi.WeatherHandler;
 import server.weatherapi.WeatherQuery;
 import server.weatherapi.WeatherUtilities;
 import spark.Spark;
 
-/**
- * integration and unit tests for weather api and caching
- */
+/** integration and unit tests for weather api and caching */
 public class WeatherHandlerTests {
 
-  /**
-   * Before all tests, a server is sparked on port 0 and a root logger is established.
-   */
+  /** Before all tests, a server is sparked on port 0 and a root logger is established. */
   @BeforeAll
   public static void setup_before_everything() {
 
@@ -50,8 +45,7 @@ public class WeatherHandlerTests {
    * @throws IOException when error occurs in connection
    */
   private String getQueryResult(HttpURLConnection inURL) throws IOException {
-    BufferedReader in = new BufferedReader(
-        new InputStreamReader(inURL.getInputStream()));
+    BufferedReader in = new BufferedReader(new InputStreamReader(inURL.getInputStream()));
     String inputLine;
     StringBuilder content = new StringBuilder();
     while ((inputLine = in.readLine()) != null) {
@@ -79,9 +73,7 @@ public class WeatherHandlerTests {
     Spark.awaitInitialization();
   }
 
-  /**
-   * After each test, gracefully stop the Spark server.
-   */
+  /** After each test, gracefully stop the Spark server. */
   @AfterEach
   public void teardown() {
     // Gracefully stop Spark listening on both endpoints
@@ -96,7 +88,7 @@ public class WeatherHandlerTests {
    * @return - return the connection
    * @throws IOException thrown when creating URL, calling openConnection(), or connect()
    */
-  static private HttpURLConnection tryRequest(String apiCall) throws IOException {
+  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
     URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
     clientConnection.connect();
@@ -105,19 +97,23 @@ public class WeatherHandlerTests {
 
   /**
    * Tests that a bad request error is returned when weather is requested with no arguments
+   *
    * @throws IOException thrown by tryRequest
    */
   @Test
-  public void testWeather() throws IOException{
+  public void testWeather() throws IOException {
     HttpURLConnection weatherConnection = tryRequest("weather");
     String response = this.getQueryResult(weatherConnection);
-    assertEquals(response, "{\"result\":\"error_bad_request\",\"message\":\"Please provide "
-        + "doubles for both latitude ('lat') and longitude ('lon') to get weather temperature\"}");
+    assertEquals(
+        response,
+        "{\"result\":\"error_bad_request\",\"message\":\"Please provide "
+            + "doubles for both latitude ('lat') and longitude ('lon') to get weather temperature\"}");
   }
 
   /**
-   * tests that a weather query successfullu stores the results in a WeatherRecord and that the values
-   * are correct
+   * tests that a weather query successfullu stores the results in a WeatherRecord and that the
+   * values are correct
+   *
    * @throws IOException thrown by tryRequest
    * @throws ExecutionException thrown by queryWeather
    */
@@ -126,7 +122,8 @@ public class WeatherHandlerTests {
     WeatherQuery weatherQuery = new WeatherQuery();
     WeatherCache cache = new WeatherCache(1, TimeUnit.MINUTES, weatherQuery);
     tryRequest("weather?lat=41.8&lon=-71.4");
-    WeatherUtilities.WeatherCoordinates queryCoord = new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
+    WeatherUtilities.WeatherCoordinates queryCoord =
+        new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
     WeatherUtilities.WeatherRecord value = cache.queryWeather(queryCoord);
     assertEquals(value.date(), java.time.LocalDateTime.now().toLocalDate().toString());
     assertEquals(value.temperatureUnit(), "F");
@@ -136,32 +133,39 @@ public class WeatherHandlerTests {
   }
 
   /**
-   * tests to see if inputting coordinates not in the NWS system throws an UncheckedExecutionException
+   * tests to see if inputting coordinates not in the NWS system throws an
+   * UncheckedExecutionException
    */
   @Test
   public void testWeatherBadCoords() {
     WeatherQuery weatherQuery = new WeatherQuery();
     WeatherCache cache = new WeatherCache(1, TimeUnit.MINUTES, weatherQuery);
-    WeatherUtilities.WeatherCoordinates queryCoord = new WeatherUtilities.WeatherCoordinates(-41.8, 71.4, 1.);
+    WeatherUtilities.WeatherCoordinates queryCoord =
+        new WeatherUtilities.WeatherCoordinates(-41.8, 71.4, 1.);
     assertThrows(UncheckedExecutionException.class, () -> cache.queryWeather(queryCoord));
   }
 
   /**
    * tests that the correct error response is thrown when inputted coordinates are not doubles
+   *
    * @throws IOException
    */
   @Test
   public void testWeatherNoDoubles() throws IOException {
     HttpURLConnection weatherConnection = tryRequest("weather?lat=41&lon=-71");
     String response = this.getQueryResult(weatherConnection);
-    assertEquals(response, "{\"result\":\"error_datasource\",\"lon\":\"-71\",\"message\":"
-        + "\"java.lang.IllegalStateException: Failure to establish connection with or error response"
-        + " from https://api.weather.gov\",\"lat\":\"41\"}");
+    assertEquals(
+        response,
+        "{\"result\":\"error_datasource\",\"lon\":\"-71\",\"message\":"
+            + "\"java.lang.IllegalStateException: Failure to establish connection with or error response"
+            + " from https://api.weather.gov\",\"lat\":\"41\"}");
   }
 
   /**
-   * tests that the cache can hold multiple weather records after they are queried and that subsequent
-   * calls to the weather api within the distance threshold return the cached weather record
+   * tests that the cache can hold multiple weather records after they are queried and that
+   * subsequent calls to the weather api within the distance threshold return the cached weather
+   * record
+   *
    * @throws IOException see above
    * @throws ExecutionException see above
    */
@@ -169,7 +173,8 @@ public class WeatherHandlerTests {
   public void testCaching() throws IOException, ExecutionException {
     WeatherQuery weatherQuery = new WeatherQuery();
     WeatherCache cache = new WeatherCache(1, TimeUnit.MINUTES, weatherQuery);
-    WeatherUtilities.WeatherCoordinates queryCoord = new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
+    WeatherUtilities.WeatherCoordinates queryCoord =
+        new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
     WeatherUtilities.WeatherRecord cachedValue1 = cache.queryWeather(queryCoord);
     queryCoord = new WeatherUtilities.WeatherCoordinates(34.01, -118.49, 1.);
     WeatherUtilities.WeatherRecord cachedValue2 = cache.queryWeather(queryCoord);
@@ -188,15 +193,17 @@ public class WeatherHandlerTests {
   }
 
   /**
-   * tests that returns from the weather api are different when coordinates are different from cached
-   * coordinates
+   * tests that returns from the weather api are different when coordinates are different from
+   * cached coordinates
+   *
    * @throws ExecutionException - see above
    */
   @Test
   public void testCachingNewCoords() throws ExecutionException {
     WeatherQuery weatherQuery = new WeatherQuery();
     WeatherCache cache = new WeatherCache(1, TimeUnit.MINUTES, weatherQuery);
-    WeatherUtilities.WeatherCoordinates queryCoord = new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
+    WeatherUtilities.WeatherCoordinates queryCoord =
+        new WeatherUtilities.WeatherCoordinates(41.8, -71.4, 1.);
     WeatherUtilities.WeatherRecord cachedValue1 = cache.queryWeather(queryCoord);
     queryCoord = new WeatherUtilities.WeatherCoordinates(43.2, -75.5, 1.);
     WeatherUtilities.WeatherRecord value = cache.queryWeather(queryCoord);

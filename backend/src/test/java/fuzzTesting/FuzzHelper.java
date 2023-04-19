@@ -12,14 +12,14 @@ import java.util.Random;
 
 public class FuzzHelper {
 
-
   public double randomCoordSearch(Double min, Double max) {
     Random random = new Random();
     return min + (max - min) * random.nextDouble();
   }
 
   public String randomStarSearch(Storage storage) throws IOException, FactoryFailureException {
-    Parser<ArrayList<List<String>>> p = new Parser<>(new FileReader("data/stars/stardata.csv"), new CSVToList(), true);
+    Parser<ArrayList<List<String>>> p =
+        new Parser<>(new FileReader("data/stars/stardata.csv"), new CSVToList(), true);
     List<List<String>> csvArray = new ArrayList<>();
     while (true) {
       try {
@@ -40,7 +40,7 @@ public class FuzzHelper {
     int randomValueRow = random.nextInt(119618) + 1;
 
     String ret = "";
-    switch(randomNumber) {
+    switch (randomNumber) {
       case 1:
         colName = csvArray.get(0).get(randomCol);
         value = csvArray.get(randomValueRow).get(randomValueCol);
@@ -67,5 +67,3 @@ public class FuzzHelper {
     return ret;
   }
 }
-
-

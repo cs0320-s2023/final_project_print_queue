@@ -1,6 +1,5 @@
 package fuzzTesting;
 
-import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 import static spark.Spark.after;
 
@@ -21,12 +20,9 @@ import server.csvapi.LoadHandler;
 import server.weatherapi.WeatherHandler;
 import spark.Spark;
 
-
 public class FuzzTest {
 
-  /**
-   * Before all tests, a server is sparked on port 0 and a root logger is established.
-   */
+  /** Before all tests, a server is sparked on port 0 and a root logger is established. */
   @BeforeAll
   public static void setup_before_everything() {
 
@@ -56,9 +52,7 @@ public class FuzzTest {
     Spark.awaitInitialization();
   }
 
-  /**
-   * After each test, gracefully stop the Spark server.
-   */
+  /** After each test, gracefully stop the Spark server. */
   @AfterEach
   public void teardown() {
     Spark.unmap("/loadcsv");
@@ -76,8 +70,7 @@ public class FuzzTest {
    * @throws IOException when error occurs in connection
    */
   private String getQueryResult(HttpURLConnection inURL) throws IOException {
-    BufferedReader in = new BufferedReader(
-        new InputStreamReader(inURL.getInputStream()));
+    BufferedReader in = new BufferedReader(new InputStreamReader(inURL.getInputStream()));
     String inputLine;
     StringBuilder content = new StringBuilder();
     while ((inputLine = in.readLine()) != null) {
@@ -94,7 +87,7 @@ public class FuzzTest {
    * @param apiCall - request to be sent
    * @throws IOException thrown when creating URL, calling openConnection(), or connect()
    */
-  static private HttpURLConnection tryRequest(String apiCall) throws IOException {
+  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
     URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
     clientConnection.connect();
@@ -103,15 +96,16 @@ public class FuzzTest {
 
   /**
    * fuzz tests search with valid inputs
+   *
    * @throws IOException thrown when an error occurs in the connection
    * @throws FactoryFailureException thrown when creator fails -- doesn't
    */
-
   @Test
   public void fuzzSearchTest() throws IOException, FactoryFailureException {
-    HttpURLConnection request = tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=True");
+    HttpURLConnection request =
+        tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=True");
     FuzzHelper fuzzHelper = new FuzzHelper();
-    for (int i = 0; i < 500; i ++) {
+    for (int i = 0; i < 500; i++) {
       String apiCall = fuzzHelper.randomStarSearch(this.storage);
       request = tryRequest(apiCall);
       assertTrue(request.getResponseCode() != -1);
@@ -120,6 +114,7 @@ public class FuzzTest {
 
   /**
    * fuzz tests valid weather coords
+   *
    * @throws IOException thrown when a connection error occurs
    */
   @Test
@@ -129,8 +124,7 @@ public class FuzzTest {
       Double lat = fuzzHelper.randomCoordSearch(20.0, 50.0);
       Double lon = fuzzHelper.randomCoordSearch(-130.0, -160.0);
       HttpURLConnection request = tryRequest("weather?lat=" + lat + "&lon=" + lon);
-      //assertTrue(request.getResponseCode() != -1);
+      // assertTrue(request.getResponseCode() != -1);
     }
   }
-
 }

@@ -1,5 +1,6 @@
 package queueclasses;
 
+import java.lang.StackWalker.Option;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.Optional;
 import server.APIUtilities;
 import spark.Request;
 import spark.Response;
@@ -18,10 +20,19 @@ import java.time.Duration;
  */
 public class QHandler implements Route {
   PriorityQueue<Job> printQ;
-  List<Printer> printers;
+  HashMap<String, Printer> printers;
   public QHandler(){
     this.printQ = new PriorityQueue<>();
-    this.printers = new ArrayList<>();
+    this.printers = new HashMap<>();
+    // put real name later
+    this.printers.put("p1", new Printer("p1", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p2", new Printer("p2", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p3", new Printer("p3", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p4", new Printer("p4", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p5", new Printer("p5", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p6", new Printer("p6", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p7", new Printer("p7", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p8", new Printer("p8", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
   }
 
   @Override
@@ -101,12 +112,17 @@ public class QHandler implements Route {
   }
 
   /**
-   * Updates printer status. Makes changes to printer object's instance variables
+   * Updates printer status. Makes changes to printer object's instance variables.
+   * Does not remove users from printer - use forfeit.
    * @param user
    * @param contact
    * @return
    */
   private String update(Request request) {
+    String name = request.queryParams("printer_name");
+    String filament = request.queryParams("filament");
+    String status = request.queryParams("status");
+    Map<String, Object> map = new HashMap<>();
 
 
 

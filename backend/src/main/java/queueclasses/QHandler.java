@@ -118,8 +118,6 @@ public class QHandler implements Route {
   /**
    * Updates printer status. Makes changes to printer object's instance variables.
    * Does not remove users from printer - use forfeit.
-   * @param user
-   * @param contact
    * @return
    */
   private String update(Request request) {
@@ -171,12 +169,12 @@ public class QHandler implements Route {
       message.put("message", "printer " + printerName + " does not exist");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
-    switch (printer.status) {
+    switch (printer.getStatus()) {
       case BUSY:
       case PENDING:
-        printer.status = AVAILABLE;
-        printer.currentJob = Optional.empty();
-        printer.timeStarted = LocalTime.now();
+        printer.setStatus("available");
+        printer.setCurrentJob(Optional.empty());
+        printer.setTimeStarted(LocalTime.now());
         message.put("result", "success");
         message.put("message", "printer " + printerName + " is now available");
         break;
@@ -198,15 +196,15 @@ public class QHandler implements Route {
       message.put("message", "No printer provided");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
-    Printer printer = printers.get(printerName);
+    Printer printer = this.printers.get(printerName);
     if (printer == null){
       message.put("result", "error_bad_request");
       message.put("message", "printer " + printerName + " does not exist");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
-    if (printer.status == PENDING){
-      printer.status = BUSY;
-      printer.timeStarted = LocalTime.now();
+    if (printer.getStatus() == PENDING){
+      printer.setStatus("busy");
+      printer.setTimeStarted(LocalTime.now());
       message.put("result", "success");
       message.put("message", "printer " + printerName + " claimed");
       return APIUtilities.toJson(message); // serialize to JSON for output
@@ -216,5 +214,4 @@ public class QHandler implements Route {
     }
     return APIUtilities.toJson(message); // serialize to JSON for output
   }
-
 }

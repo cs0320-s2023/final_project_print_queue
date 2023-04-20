@@ -31,6 +31,16 @@ public class Printer{
       case "reserved" -> this.status = Status.RESERVED;
     }
   }
+  public void setCurrentJob(Optional<Job> currentJob) {
+    this.currentJob = currentJob;
+  }
+  public void setTimeStarted(LocalTime time){
+    this.timeStarted = time;
+  }
+  public Status getStatus() {
+    return this.status;
+  }
+
 }
 
 enum Status {

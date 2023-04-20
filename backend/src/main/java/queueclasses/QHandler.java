@@ -31,11 +31,7 @@ public class QHandler implements Route {
 
   private String handleRequest(Request request) {
     String command = request.queryParams("command");
-    String user = request.queryParams("user");
-    String contact = request.queryParams("contact");
-    String duration = request.queryParams("duration");
     // TODO: make sure frontend formats duration correctly
-    LocalTime currTime = LocalTime.now();
 
     Map<String, Object> map = new HashMap<>();
     // error handling
@@ -47,19 +43,23 @@ public class QHandler implements Route {
   // TODO: reject from printer method later
     switch (command) {
       case "enqueue":
-        return this.enqueue(user,contact, duration, currTime);
+        return this.enqueue(request);
       case "rejectQueue":
-        return this.rejectFromQueue(user,contact);
+        return this.rejectFromQueue(request);
       case "update":
-        return this.update(user,contact);
+        return this.update(request);
       case "forfeit":
-        return this.forfeit(user,contact);
+        return this.forfeit(request);
       case "claim":
-        return this.claim(user,contact);
+        return this.claim(request);
     }
   }
 
-  private String enqueue(String user, String contact, String duration, LocalTime time) {
+  private String enqueue(Request request) {
+    String user = request.queryParams("user");
+    String contact = request.queryParams("contact");
+    String duration = request.queryParams("duration");
+    LocalTime time = LocalTime.now();
     Duration printDuration = Duration.parse(duration);
     this.printQ.add(new Job(user, contact, printDuration, time));
     Map<String, Object> map = new HashMap<>();
@@ -77,8 +77,10 @@ public class QHandler implements Route {
    * @param contact
    * @return
    */
-  private String rejectFromQueue(String user, String contact) {
+  private String rejectFromQueue(Request request) {
     //todo: contact should be unique, in an enforce way
+    String user = request.queryParams("user");
+    String contact = request.queryParams("contact");
     Map<String, Object> map = new HashMap<>();
     // error handling - user/contact not provided
     if (user == null || contact == null) {
@@ -104,13 +106,13 @@ public class QHandler implements Route {
    * @param contact
    * @return
    */
-  private String update(String user, String contact) {
+  private String update(Request request) {
 
 
 
 
   }
-  private String forfeit(String user, String contact) {}
-  private String claim(String user, String contact) {}
+  private String forfeit(Request request) {}
+  private String claim(Request request) {}
 
 }

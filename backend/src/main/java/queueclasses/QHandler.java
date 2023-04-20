@@ -45,7 +45,13 @@ public class QHandler implements Route {
     }
   }
 
-  private String enqueue(String user, String contact) {}
+  private String enqueue(String user, String contact) {
+
+
+
+
+
+  }
   private String reject(String user, String contact) {}
   private String update(String user, String contact) {}
   private String forfeit(String user, String contact) {}

@@ -24,5 +24,6 @@ enum Status {
   BUSY,
   PENDING,
   MAINTENANCE,
-  RESERVED
+  RESERVED,
+  AVAILABLE
 }

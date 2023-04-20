@@ -1,5 +1,9 @@
 package queueclasses;
 
+import static queueclasses.Status.AVAILABLE;
+import static queueclasses.Status.BUSY;
+import static queueclasses.Status.PENDING;
+
 import java.lang.StackWalker.Option;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -129,7 +133,6 @@ public class QHandler implements Route {
 
   }
   private String rejectPrinter(Request request) {
-    //todo: printerName is a assumed to be unique. enforece that
     String printerName = request.queryParams("printerName");
     Map<String, Object> message = new HashMap<>();
     // error handling - user/contact not provided
@@ -138,9 +141,56 @@ public class QHandler implements Route {
       message.put("message", "No printer provided");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
+    Printer printer = printers.get(printerName);
+    if (printer == null){
+      message.put("result", "error_bad_request");
+      message.put("message", "printer " + printerName + " does not exist");
+      return APIUtilities.toJson(message); // serialize to JSON for output
+    }
+    switch (printer.status) {
+      case BUSY:
+      case PENDING:
+        printer.status = AVAILABLE;
+        printer.currentJob = Optional.empty();
+        printer.timeStarted = LocalTime.now();
+        message.put("result", "success");
+        message.put("message", "printer " + printerName + " is now available");
+        break;
+      case MAINTENANCE:
+      case RESERVED:
+      case AVAILABLE:
+        message.put("result", "error_bad_request");
+        message.put("message", "printer " + printerName + " is not busy or reserved");
+        break;
+    }
+    return APIUtilities.toJson(message); // serialize to JSON for output
   }
   private String claim(Request request) {
-    
+    String printerName = request.queryParams("printerName");
+    Map<String, Object> message = new HashMap<>();
+    // error handling - user/contact not provided
+    if (printerName == null) {
+      message.put("result", "error_bad_request");
+      message.put("message", "No printer provided");
+      return APIUtilities.toJson(message); // serialize to JSON for output
+    }
+    Printer printer = printers.get(printerName);
+    if (printer == null){
+      message.put("result", "error_bad_request");
+      message.put("message", "printer " + printerName + " does not exist");
+      return APIUtilities.toJson(message); // serialize to JSON for output
+    }
+    if (printer.status == PENDING){
+      printer.status = BUSY;
+      printer.timeStarted = LocalTime.now();
+      message.put("result", "success");
+      message.put("message", "printer " + printerName + " claimed");
+      return APIUtilities.toJson(message); // serialize to JSON for output
+    }else {
+      message.put("result", "error_bad_request");
+      message.put("message", "printer " + printerName + " does not have a job pending");
+    }
+    return APIUtilities.toJson(message); // serialize to JSON for output
   }
 
 }

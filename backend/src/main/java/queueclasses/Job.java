@@ -1,6 +1,6 @@
 package queueclasses;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.time.Duration;
 
 /**
@@ -11,4 +11,4 @@ import java.time.Duration;
  *                  from the Prusa Slicer estimate, but not checked
  * @param timeQueued recorded automatically
  */
-public record Job(String user, String contact, Duration printTime, Time timeQueued) {}
+public record Job(String user, String contact, Duration printTime, LocalTime timeQueued) {}

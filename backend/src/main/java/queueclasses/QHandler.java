@@ -29,14 +29,14 @@ public class QHandler implements Route {
     this.printQ = new PriorityQueue<>();
     this.printers = new HashMap<>();
     // put real name later
-    this.printers.put("p1", new Printer("p1", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p2", new Printer("p2", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p3", new Printer("p3", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p4", new Printer("p4", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p5", new Printer("p5", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p6", new Printer("p6", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p7", new Printer("p7", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
-    this.printers.put("p8", new Printer("p8", "Unloaded", Status.PENDING, LocalTime.now(), Optional.empty()));
+    this.printers.put("p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p2", new Printer("p2", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p3", new Printer("p3", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p4", new Printer("p4", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p5", new Printer("p5", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
   }
 
   @Override
@@ -128,9 +128,33 @@ public class QHandler implements Route {
     String status = request.queryParams("status");
     Map<String, Object> map = new HashMap<>();
 
-
-
-
+    // error handling - no name
+    if (name == null) {
+      map.put("result", "error_bad_request");
+      map.put("message", "No printer name was provided!");
+      return APIUtilities.toJson(map); // serialize to JSON for output
+    }
+    // nothing was specified
+    if (filament == null && status == null) {
+      map.put("result", "error_bad_request");
+      map.put("message", "No filament or status update was provided!");
+      return APIUtilities.toJson(map); // serialize to JSON for output
+    }
+    Printer printerToUpdate = this.printers.get(name);
+    if (printerToUpdate == null) {
+      map.put("result", "error_bad_request");
+      map.put("message", "Printer name is invalid.");
+      return APIUtilities.toJson(map); // serialize to JSON for output
+    }
+    // now, assuming we have a valid printer, filament and/or status to update
+    if (filament != null) {
+      printerToUpdate.setFilament(filament);
+    }
+    if (status != null) {
+      printerToUpdate.setStatus(status);
+    }
+    map.put("result", "success");
+    return APIUtilities.toJson(map); // serialize to JSON for output
   }
   private String rejectPrinter(Request request) {
     String printerName = request.queryParams("printerName");

@@ -1,5 +1,8 @@
 package queueclasses;
 
+import java.sql.Time;
+import java.time.Duration;
+
 /**
  *
  * @param user given by the user through the enqueue menu
@@ -8,4 +11,4 @@ package queueclasses;
  *                  from the Prusa Slicer estimate, but not checked
  * @param timeQueued recorded automatically
  */
-public record Job(String user, String contact, double printTime, double timeQueued) {}
+public record Job(String user, String contact, Duration printTime, Time timeQueued) {}

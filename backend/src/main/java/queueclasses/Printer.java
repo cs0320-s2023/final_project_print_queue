@@ -1,13 +1,28 @@
 package queueclasses;
 
-/**
- * todo
- * @param name should be consistent with BDW naming
- * @param filamentColor currently loaded filament
- */
-public record Printer(String name, Color filamentColor) {
+import java.sql.Time;
+import java.util.Optional;
+
+public class Printer{
+  String name;
+  String filament;
+  Status status;
+  Time timeStarted;
+  Optional<Job> currentJob;
+
+  public Printer(String name, String filament, Status status, Time timeStarted,
+      Optional<Job> currentJob){
+    this.name = name;
+    this.filament = filament;
+    this.status = status;
+    this.timeStarted = timeStarted;
+    this.currentJob = currentJob;
+  }
 }
-enum Color {
-  EX1,//todo: real colors
-  EX2,
+
+enum Status {
+  BUSY,
+  PENDING,
+  MAINTENANCE,
+  RESERVED
 }

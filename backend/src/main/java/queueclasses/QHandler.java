@@ -1,7 +1,9 @@
 package queueclasses;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import spark.Request;
@@ -13,10 +15,10 @@ import spark.Route;
  */
 public class QHandler implements Route {
   PriorityQueue<Job> printQ;
-  Map<Printer, PrinterState> printerStates;
+  List<Printer> printers;
   public QHandler(){
     this.printQ = new PriorityQueue<>();
-    this.printerStates = new HashMap<>();
+    this.printers = new ArrayList<>();
   }
 
   @Override

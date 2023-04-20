@@ -48,5 +48,4 @@ public class QHandler implements Route {
   private String forfeit(String user, String contact) {}
   private String claim(String user, String contact) {}
 
-
 }

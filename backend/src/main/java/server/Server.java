@@ -2,6 +2,7 @@ package server;
 
 import static spark.Spark.after;
 
+import queueclasses.QHandler;
 import spark.Spark;
 
 /**
@@ -22,8 +23,7 @@ public class Server {
           response.header("Access-Control-Allow-Origin", "*");
           response.header("Access-Control-Allow-Methods", "*");
         });
-    // TODO: make Handler for new api
-    // Spark.get("loadcsv", new LoadHandler(storage));
+    Spark.get("qHandle", new QHandler());
     Spark.init();
     Spark.awaitInitialization();
     System.out.println("Server started.");

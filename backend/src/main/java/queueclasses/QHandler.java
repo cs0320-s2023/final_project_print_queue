@@ -48,8 +48,8 @@ public class QHandler implements Route {
         return this.rejectFromQueue(request);
       case "update":
         return this.update(request);
-      case "forfeit":
-        return this.forfeit(request);
+      case "rejectPrinter":
+        return this.rejectPrinter(request);
       case "claim":
         return this.claim(request);
     }
@@ -112,7 +112,19 @@ public class QHandler implements Route {
 
 
   }
-  private String forfeit(Request request) {}
-  private String claim(Request request) {}
+  private String rejectPrinter(Request request) {
+    //todo: printerName is a assumed to be unique. enforece that
+    String printerName = request.queryParams("printerName");
+    Map<String, Object> message = new HashMap<>();
+    // error handling - user/contact not provided
+    if (printerName == null) {
+      message.put("result", "error_bad_request");
+      message.put("message", "No printer provided");
+      return APIUtilities.toJson(message); // serialize to JSON for output
+    }
+  }
+  private String claim(Request request) {
+    
+  }
 
 }

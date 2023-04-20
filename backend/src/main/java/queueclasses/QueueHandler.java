@@ -7,11 +7,11 @@ import java.util.PriorityQueue;
 /**
  * todo
  */
-public class QueueHandler {
-  PriorityQueue<Job> printQueue;
+public class QHandler {
+  PriorityQueue<Job> printQ;
   Map<Printer, PrinterState> printerStates;
-  QueueHandler(){
-    this.printQueue = new PriorityQueue<>();
+  QHandler(){
+    this.printQ = new PriorityQueue<>();
     this.printerStates = new HashMap<>();
   }
 

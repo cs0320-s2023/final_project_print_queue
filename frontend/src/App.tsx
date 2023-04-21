@@ -1,23 +1,25 @@
 import React from "react";
 import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage/Home";
+import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
+import PrintersPage from "./pages/PrintersPage/PrintersPage";
+import NavBar from "./components/NavBar";
+import QueuePage from "./pages/QueuePage/QueuePage";
+import LoginPage from "./pages/LoginPage/Login";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/queue" element={<QueuePage />} />
+        <Route path="/printers" element={<PrintersPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -6,8 +6,8 @@ import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import PrintersPage from "./pages/PrintersPage/PrintersPage";
 import QueuePage from "./pages/QueuePage/QueuePage";
 import Nav from "./components/Nav";
-import Login from "./pages/Auth/Login";
 import Profile from "./pages/Auth/profile";
+import Login from "./pages/Auth/login";
 
 function App() {
   return (

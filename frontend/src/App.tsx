@@ -4,20 +4,22 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage/Home";
 import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 import PrintersPage from "./pages/PrintersPage/PrintersPage";
-import NavBar from "./components/NavBar";
 import QueuePage from "./pages/QueuePage/QueuePage";
-import LoginPage from "./pages/LoginPage/Login";
+import Nav from "./components/Nav";
+import Login from "./pages/Auth/Login";
+import Profile from "./pages/Auth/profile";
 
 function App() {
   return (
     <Router>
-      <NavBar />
+      <Nav />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/queue" element={<QueuePage />} />
         <Route path="/printers" element={<PrintersPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

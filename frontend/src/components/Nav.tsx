@@ -1,8 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../utils/firebase";
 
-function NavBar() {
+function Nav() {
+  const [user, loading] = useAuthState(auth);
+
   return (
     <Box
       display="flex"
@@ -17,10 +21,20 @@ function NavBar() {
         <Link to="/resources">Resources</Link>
         <Link to="/queue">Queue</Link>
         <Link to="/printers">Printers</Link>
-        <Link to="/login">Login</Link>
+        {!user && <Link to="/auth/login">Login</Link>}
+        {user && (
+          <div>
+            <Link to="/profile">
+              <img
+                src={user.photoURL != null ? user.photoURL : undefined}
+                alt="avatar"
+              />
+            </Link>
+          </div>
+        )}
       </Box>
     </Box>
   );
 }
 
-export default NavBar;
+export default Nav;

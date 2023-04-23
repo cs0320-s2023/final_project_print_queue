@@ -59,6 +59,9 @@ function Login() {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Stack spacing={8} mx={"auto"} py={12} px={6}>
+          <Heading fontSize={"4xl"} textAlign={"center"}>
+            Welcome to PrintQ 👋
+          </Heading>
           <Box
             rounded={"lg"}
             bg={useColorModeValue("white", "gray.700")}
@@ -69,9 +72,7 @@ function Login() {
               <Box>
                 <Lottie options={defaultOptions} height={400} width={400} />
               </Box>
-              <Heading fontSize={"4xl"} textAlign={"center"}>
-                Welcome to PrintQ
-              </Heading>
+
               <Text fontSize={"lg"} color={"gray.600"}>
                 Sign in with a Google Account to get started.
               </Text>

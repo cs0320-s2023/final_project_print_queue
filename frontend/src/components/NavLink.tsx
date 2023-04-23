@@ -6,7 +6,7 @@ interface NavLinkProps {
   children: JSX.Element | string;
 }
 
-function MyNavLink({ to, children }: NavLinkProps) {
+function NavLink({ to, children }: NavLinkProps) {
   const linkColor = useColorModeValue("black", "gray.200");
   const linkHoverColor = useColorModeValue("#FF7B15", "white");
 
@@ -28,4 +28,4 @@ function MyNavLink({ to, children }: NavLinkProps) {
   );
 }
 
-export default MyNavLink;
+export default NavLink;

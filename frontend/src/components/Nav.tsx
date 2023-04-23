@@ -14,8 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../utils/firebase";
-import { NavLink } from "react-router-dom";
-import MyNavLink from "./NavLink";
+import NavLink from "./NavLink";
 
 const navItems = [
   {
@@ -45,12 +44,14 @@ function Nav() {
   return (
     <Flex w="100%" px="6" py="5" justify="space-between" alignItems="center">
       <Heading as="h1" size="lg">
-        <NavLink to="/">PrintQ</NavLink>
+        <ReactRouterLink to="/">PrintQ</ReactRouterLink>
       </Heading>
       <HStack spacing={5} alignItems="center">
         <HStack justify="space-between" spacing={6}>
-          {navItems.map((navItem) => (
-            <MyNavLink to={navItem.endpoint}>{navItem.label}</MyNavLink>
+          {navItems.map((navItem, index) => (
+            <NavLink key={index} to={navItem.endpoint}>
+              {navItem.label}
+            </NavLink>
           ))}
         </HStack>
         {!user && (

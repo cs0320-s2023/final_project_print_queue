@@ -1,39 +1,103 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Box } from "@chakra-ui/react";
+import React, { useState } from "react";
+
+import { Link as ReactRouterLink, useLocation } from "react-router-dom";
+import {
+  Flex,
+  HStack,
+  Heading,
+  Button,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../utils/firebase";
+import NavLink from "./NavLink";
+
+const navItems = [
+  {
+    label: "Queue",
+    endpoint: "/queue",
+  },
+  {
+    label: "Printers",
+    endpoint: "/printers",
+  },
+  {
+    label: "Resources",
+    endpoint: "/resources",
+  },
+];
 
 function Nav() {
   const [user, loading] = useAuthState(auth);
 
+  const location = useLocation();
+  const hideNavbarPaths = ["/auth/login", "/auth/signup"];
+
+  if (hideNavbarPaths.includes(location.pathname)) {
+    return null; // don't render navbar on login/signup pages
+  }
+
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      align-items="center"
-      width="100%"
-    >
-      <Box></Box>
-      <Box display="flex" flexDirection="row">
-        <Link to="/">Home</Link>
-        <Link to="/resources">Resources</Link>
-        <Link to="/queue">Queue</Link>
-        <Link to="/printers">Printers</Link>
-        {!user && <Link to="/auth/login">Login</Link>}
-        {user && (
-          <div>
-            <Link to="/profile">
-              <img
-                src={user.photoURL != null ? user.photoURL : undefined}
-                alt="avatar"
-              />
-            </Link>
-          </div>
+    <Flex w="100%" px="6" py="5" justify="space-between" alignItems="center">
+      <Heading as="h1" size="lg">
+        <ReactRouterLink to="/">PrintQ</ReactRouterLink>
+      </Heading>
+      <HStack spacing={5} alignItems="center">
+        <HStack justify="space-between" spacing={6}>
+          {navItems.map((navItem, index) => (
+            <NavLink key={index} to={navItem.endpoint}>
+              {navItem.label}
+            </NavLink>
+          ))}
+        </HStack>
+        {!user && (
+          <HStack spacing={5}>
+            <Button
+              as={ReactRouterLink}
+              to="/auth/login"
+              size="md"
+              fontSize="md"
+              fontWeight="medium"
+              px="5"
+              py="3"
+              borderRadius="md"
+              _hover={{
+                textDecoration: "none",
+              }}
+            >
+              Log In / Sign Up
+            </Button>
+          </HStack>
         )}
-      </Box>
-    </Box>
+        {user && (
+          <Menu>
+            <MenuButton as={Button} variant={"unstyled"}>
+              <Avatar
+                // name="Dan Abrahmov"
+                size="md"
+                src={user.photoURL != null ? user.photoURL : undefined}
+              />
+            </MenuButton>
+            <MenuList>
+              <MenuItem as={ReactRouterLink} to="/profile">
+                Profile
+              </MenuItem>
+              <MenuItem
+                as={ReactRouterLink}
+                to="/"
+                onClick={() => auth.signOut()}
+              >
+                Sign Out
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        )}
+      </HStack>
+    </Flex>
   );
 }
 

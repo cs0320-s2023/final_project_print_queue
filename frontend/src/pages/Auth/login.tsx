@@ -1,13 +1,33 @@
-import { FcGoogle } from "react-icons/fc";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { Navigate, useNavigate } from "react-router";
-import { auth } from "../../utils/firebase";
+import React from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Stack,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect } from "react";
+import { auth } from "../../utils/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+
+import animationData from "../../assets/hello.json";
+import Lottie from "react-lottie";
 
 function Login() {
   const [user, loading] = useAuthState(auth);
+
+  // Navigation: Redirects user to dashboard if they are already logged in
   const navigate = useNavigate();
+  useEffect(() => {
+    if (user) {
+      navigate("/profile");
+    }
+  }, [user]);
 
   // Google Authentication
   const googleProvider = new GoogleAuthProvider();
@@ -21,26 +41,54 @@ function Login() {
     }
   };
 
-  // Redirects user to dashboard if they are already logged in
-  useEffect(() => {
-    if (user) {
-      navigate("/profile");
-    }
-  }, [user]);
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   return (
-    <div>
-      <h2>Join Today</h2>
-      <div>
-        <h3>Sign in with Google</h3>
-      </div>
-      <div>
-        <button onClick={GoogleLogin}>
-          <FcGoogle />
-          Sign in with Google
-        </button>
-      </div>
-    </div>
+    <>
+      <Flex
+        minH={"100vh"}
+        align={"center"}
+        justify={"center"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+      >
+        <Stack spacing={8} mx={"auto"} py={12} px={6}>
+          <Box
+            rounded={"lg"}
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow={"lg"}
+            p={8}
+          >
+            <Stack align={"center"}>
+              <Box>
+                <Lottie options={defaultOptions} height={400} width={400} />
+              </Box>
+              <Heading fontSize={"4xl"} textAlign={"center"}>
+                Welcome to PrintQ
+              </Heading>
+              <Text fontSize={"lg"} color={"gray.600"}>
+                Sign in with a Google Account to get started.
+              </Text>
+
+              <Button
+                variant="outline"
+                size="lg"
+                leftIcon={<FcGoogle />}
+                onClick={GoogleLogin}
+              >
+                Sign up with Google
+              </Button>
+            </Stack>
+          </Box>
+        </Stack>
+      </Flex>
+    </>
   );
 }
 

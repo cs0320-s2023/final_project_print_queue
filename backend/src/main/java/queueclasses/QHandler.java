@@ -1,17 +1,11 @@
 package queueclasses;
 
 import static queueclasses.Status.AVAILABLE;
-import static queueclasses.Status.BUSY;
 import static queueclasses.Status.PENDING;
 
-import java.lang.StackWalker.Option;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.PriorityQueue;
 import java.util.Optional;
 import server.APIUtilities;
 import server.JobQueue;

@@ -55,7 +55,6 @@ public class QHandler implements Route {
       map.put("message", "No command provided.");
       return APIUtilities.toJson(map); // serialize to JSON for output
     }
-  // TODO: reject from printer method later
     switch (command) {
       case "enqueue":
         return this.enqueue(request);
@@ -67,7 +66,24 @@ public class QHandler implements Route {
         return this.rejectPrinter(request);
       case "claim":
         return this.claim(request);
+      case "getState":
+        return this.getState(request);
     }
+    map.put("result", "error_bad_request");
+    map.put("message", "Invalid command provided.");
+    return APIUtilities.toJson(map); // serialize to JSON for output
+  }
+
+  /**
+   *
+   * @param request
+   * @return the serialization of printQ and printers
+   */
+  private String getState(Request request){
+    Map toSerialize = new HashMap();
+    toSerialize.put("printQ", printQ);
+    toSerialize.put("printers", printers);
+    return APIUtilities.toJson(toSerialize); // serialize to JSON for output
   }
 
   private String enqueue(Request request) {

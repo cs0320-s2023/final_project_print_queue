@@ -39,11 +39,22 @@ public class QHandler implements Route {
     this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
   }
 
+  /**
+   * passes an api request along to the handleRequest function
+   * @param request
+   * @param response
+   * @return the serialized result to return to the client
+   */
   @Override
   public Object handle(Request request, Response response) {
     return this.handleRequest(request);
   }
 
+  /**
+   * Identifies the command being invoked, and passes it along to the appropriate handler
+   * @param request
+   * @return the serialized result to return to the client
+   */
   private String handleRequest(Request request) {
     String command = request.queryParams("command");
     // TODO: make sure frontend formats duration correctly
@@ -76,16 +87,22 @@ public class QHandler implements Route {
 
   /**
    *
-   * @param request
+   * @param request the original API request object. not used here
    * @return the serialization of printQ and printers
    */
   private String getState(Request request){
     Map toSerialize = new HashMap();
     toSerialize.put("printQ", printQ);
     toSerialize.put("printers", printers);
+    toSerialize.put("result", "success");
     return APIUtilities.toJson(toSerialize); // serialize to JSON for output
   }
 
+  /**
+   *  Adds a job to the queue
+   * @param request should contain user, contact, and duration parameters
+   * @return A success or failure message
+   */
   private String enqueue(Request request) {
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
@@ -104,12 +121,11 @@ public class QHandler implements Route {
 
   /**
    * Kicks user from queue if not already assigned to printer.
-   * @param user
-   * @param contact
-   * @return
+   * @param request The original API request object. Should hold a user and contact param
+   * @return success or failure message
    */
   private String rejectFromQueue(Request request) {
-    //todo: contact should be unique, in an enforce way
+    //todo: contact should be unique, in an enforced way
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
     Map<String, Object> map = new HashMap<>();
@@ -132,9 +148,10 @@ public class QHandler implements Route {
   }
 
   /**
-   * Updates printer status. Makes changes to printer object's instance variables.
-   * Does not remove users from printer - use forfeit.
-   * @return
+   *  Updates printer status. Makes changes to printer object's instance variables.
+   *  Does not remove users from printer - use forfeit.
+   * @param request should contain printer_name, filament, and status params
+   * @return a success or failure message
    */
   private String update(Request request) {
     String name = request.queryParams("printer_name");
@@ -170,6 +187,12 @@ public class QHandler implements Route {
     map.put("result", "success");
     return APIUtilities.toJson(map); // serialize to JSON for output
   }
+
+  /**
+   * removes any current job from the specified printer, and makes the printer available
+   * @param request Should hold a printerName param
+   * @return a success or failure message
+   */
   private String rejectPrinter(Request request) {
     String printerName = request.queryParams("printerName");
     Map<String, Object> message = new HashMap<>();
@@ -203,6 +226,12 @@ public class QHandler implements Route {
     }
     return APIUtilities.toJson(message); // serialize to JSON for output
   }
+
+  /**
+   * Changes a printer with a pending job to busy status
+   * @param request should contain a printerName parameter
+   * @return a success or failure message
+   */
   private String claim(Request request) {
     String printerName = request.queryParams("printerName");
     Map<String, Object> message = new HashMap<>();

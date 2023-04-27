@@ -74,9 +74,12 @@ public class QHandler implements Route {
       case "update" -> this.update(request);
       case "rejectPrinter" -> this.rejectPrinter(request);
       case "claim" -> this.claim(request);
-      default ->
-          // should never get to this point.
-          APIUtilities.toJson(map);
+      case "getState" -> this.getState(request);
+      default -> {
+        map.put("result", "error_bad_request");
+        map.put("message", "No command provided.");
+        yield APIUtilities.toJson(map);
+      }
     };
     this.assignPrinters();
     return ret;
@@ -118,12 +121,8 @@ public class QHandler implements Route {
 
   /**
    * Kicks user from queue if not already assigned to printer.
-<<<<<<< Updated upstream
    * @param request The original API request object. Should hold a user and contact param
    * @return success or failure message
-=======
-   * @return
->>>>>>> Stashed changes
    */
   private String rejectFromQueue(Request request) {
     //todo: contact should be unique, in an enforced way

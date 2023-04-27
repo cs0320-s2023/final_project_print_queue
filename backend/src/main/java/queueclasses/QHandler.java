@@ -178,6 +178,9 @@ public class QHandler implements Route {
       return APIUtilities.toJson(map); // serialize to JSON for output
     }
     // now, assuming we have a valid printer, filament and/or status to update
+    
+    //updates the start time
+    printerToUpdate.setTimeStarted(LocalTime.now());
     if (filament != null) {
       printerToUpdate.setFilament(filament);
     }

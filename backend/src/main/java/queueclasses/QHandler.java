@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Optional;
 import server.APIUtilities;
+import server.JobQueue;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -23,10 +24,10 @@ import java.time.Duration;
  * todo
  */
 public class QHandler implements Route {
-  PriorityQueue<Job> printQ;
+  JobQueue printQ;
   HashMap<String, Printer> printers;
   public QHandler(){
-    this.printQ = new PriorityQueue<>();
+    this.printQ = new JobQueue();
     this.printers = new HashMap<>();
     // put real name later
     this.printers.put("p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
@@ -66,23 +67,19 @@ public class QHandler implements Route {
       map.put("message", "No command provided.");
       return APIUtilities.toJson(map); // serialize to JSON for output
     }
-    switch (command) {
-      case "enqueue":
-        return this.enqueue(request);
-      case "rejectQueue":
-        return this.rejectFromQueue(request);
-      case "update":
-        return this.update(request);
-      case "rejectPrinter":
-        return this.rejectPrinter(request);
-      case "claim":
-        return this.claim(request);
-      case "getState":
-        return this.getState(request);
-    }
-    map.put("result", "error_bad_request");
-    map.put("message", "Invalid command provided.");
-    return APIUtilities.toJson(map); // serialize to JSON for output
+  // TODO: reject from printer method later
+    String ret = switch (command) {
+      case "enqueue" -> this.enqueue(request);
+      case "rejectQueue" -> this.rejectFromQueue(request);
+      case "update" -> this.update(request);
+      case "rejectPrinter" -> this.rejectPrinter(request);
+      case "claim" -> this.claim(request);
+      default ->
+          // should never get to this point.
+          APIUtilities.toJson(map);
+    };
+    this.assignPrinters();
+    return ret;
   }
 
   /**
@@ -109,7 +106,7 @@ public class QHandler implements Route {
     String duration = request.queryParams("duration");
     LocalTime time = LocalTime.now();
     Duration printDuration = Duration.parse(duration);
-    this.printQ.add(new Job(user, contact, printDuration, time));
+    this.printQ.enqueue(new Job(user, contact, printDuration, time));
     Map<String, Object> map = new HashMap<>();
     map.put("user", user);
     map.put("contact", contact);
@@ -121,8 +118,12 @@ public class QHandler implements Route {
 
   /**
    * Kicks user from queue if not already assigned to printer.
+<<<<<<< Updated upstream
    * @param request The original API request object. Should hold a user and contact param
    * @return success or failure message
+=======
+   * @return
+>>>>>>> Stashed changes
    */
   private String rejectFromQueue(Request request) {
     //todo: contact should be unique, in an enforced way
@@ -137,7 +138,7 @@ public class QHandler implements Route {
     }
     map.put("user", user);
     map.put("contact", contact);
-    if (this.printQ.removeIf(job -> contact.equals(job.contact()))) {
+    if (this.printQ.getQueue().removeIf(job -> contact.equals(job.contact()))) {
       // true when elements are removed
       map.put("result", "success");
       return APIUtilities.toJson(map); // serialize to JSON for output
@@ -215,7 +216,6 @@ public class QHandler implements Route {
       case BUSY:
       case PENDING:
         printer.setStatus("available");
-        printer.setCurrentJob(Optional.empty());
         printer.setTimeStarted(LocalTime.now());
         message.put("result", "success");
         message.put("message", "printer " + printerName + " is now available");
@@ -261,5 +261,15 @@ public class QHandler implements Route {
       message.put("message", "printer " + printerName + " does not have a job pending");
     }
     return APIUtilities.toJson(message); // serialize to JSON for output
+  }
+
+  private void assignPrinters() {
+    for (Printer printer : this.printers.values()) {
+      if (printer.getStatus() == AVAILABLE && !(this.printQ.getQueue().isEmpty())) {
+        printer.setCurrentJob(this.printQ.dequeue());
+        printer.setStatus("busy");
+        printer.setTimeStarted(LocalTime.now());
+      }
+    }
   }
 }

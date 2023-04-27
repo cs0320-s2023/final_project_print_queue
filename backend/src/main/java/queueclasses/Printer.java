@@ -24,7 +24,7 @@ public class Printer{
     this.filament = filament;
     this.status = status;
     this.timeStarted = timeStarted;
-    this.currentJob = currentJob;
+    this.currentJob = Optional.empty();
   }
 
   /**
@@ -48,13 +48,12 @@ public class Printer{
       case "reserved" -> this.status = Status.RESERVED;
     }
   }
-
   /**
    * setter for the currentJob parameter
    * @param currentJob the new Optional<job>
    */
-  public void setCurrentJob(Optional<Job> currentJob) {
-    this.currentJob = currentJob;
+  public void setCurrentJob(Job currentJob) {
+    this.currentJob = Optional.of(currentJob);
   }
   /**
    * setter for the timeStarted parameter
@@ -94,5 +93,5 @@ enum Status {
   BUSY,
   PENDING,
   MAINTENANCE,
-  RESERVED,
+  RESERVED
 }

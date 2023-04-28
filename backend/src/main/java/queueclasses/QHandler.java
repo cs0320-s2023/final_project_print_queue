@@ -14,9 +14,6 @@ import spark.Response;
 import spark.Route;
 import java.time.Duration;
 
-/**
- * todo
- */
 public class QHandler implements Route {
   JobQueue printQ;
   HashMap<String, Printer> printers;
@@ -32,6 +29,15 @@ public class QHandler implements Route {
     this.printers.put("p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
     this.printers.put("p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
     this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+  }
+  /**
+   * Used for testing
+   * @return a QHandler with all printers reserved
+   */
+  static public QHandler fullyReserved(){
+    QHandler toReturn = new QHandler();
+    toReturn.printers.values().stream().forEach(printer -> printer.setStatus("reserved"));
+    return toReturn;
   }
 
   /**
@@ -97,7 +103,7 @@ public class QHandler implements Route {
    * @param request should contain user, contact, and duration parameters
    * @return A success or failure message
    */
-  private String enqueue(Request request) {
+  public String enqueue(Request request) {
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
     String duration = request.queryParams("duration");
@@ -118,7 +124,7 @@ public class QHandler implements Route {
    * @param request The original API request object. Should hold a user and contact param
    * @return success or failure message
    */
-  private String rejectFromQueue(Request request) {
+  public String rejectFromQueue(Request request) {
     //todo: contact should be unique, in an enforced way
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
@@ -147,7 +153,7 @@ public class QHandler implements Route {
    * @param request should contain printer_name, filament, and status params
    * @return a success or failure message
    */
-  private String update(Request request) {
+  public String update(Request request) {
     String name = request.queryParams("printer_name");
     String filament = request.queryParams("filament");
     String status = request.queryParams("status");

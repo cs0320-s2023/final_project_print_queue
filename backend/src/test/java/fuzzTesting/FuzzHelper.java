@@ -1,9 +1,6 @@
 package fuzzTesting;
 
-import edu.brown.cs.student.parser.CSVEndException;
-import edu.brown.cs.student.parser.CSVToList;
-import edu.brown.cs.student.parser.FactoryFailureException;
-import edu.brown.cs.student.parser.Parser;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +13,7 @@ public class FuzzHelper {
     Random random = new Random();
     return min + (max - min) * random.nextDouble();
   }
-
+  /*
   public String randomStarSearch(Storage storage) throws IOException, FactoryFailureException {
     Parser<ArrayList<List<String>>> p =
         new Parser<>(new FileReader("data/stars/stardata.csv"), new CSVToList(), true);
@@ -65,5 +62,5 @@ public class FuzzHelper {
         ret = "searchcsv?val=" + value;
     }
     return ret;
-  }
+  }*/
 }

@@ -15,7 +15,7 @@ import spark.Route;
 import java.time.Duration;
 
 public class QHandler implements Route {
-  JobQueue printQ;
+  public JobQueue printQ;
   HashMap<String, Printer> printers;
   public QHandler(){
     this.printQ = new JobQueue();
@@ -114,7 +114,6 @@ public class QHandler implements Route {
     map.put("user", user);
     map.put("contact", contact);
     map.put("duration", duration);
-    map.put("time", time);
     map.put("result", "success");
     return APIUtilities.toJson(map); // serialize to JSON for output
   }

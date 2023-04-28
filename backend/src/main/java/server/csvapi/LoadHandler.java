@@ -1,10 +1,6 @@
 package server.csvapi;
- being kept as a template for future handlers.
 
- import edu.brown.cs.student.parser.CSVEndException;
- import edu.brown.cs.student.parser.CSVToList;
- import edu.brown.cs.student.parser.FactoryFailureException;
- import edu.brown.cs.student.parser.Parser;
+
  import java.io.FileNotFoundException;
  import java.io.FileReader;
  import java.io.IOException;
@@ -17,8 +13,8 @@ package server.csvapi;
  import spark.Response;
  import spark.Route;
 
-/ **
- * Load handler class handles API requests for load_file.
+/*
+  Load handler class handles API requests for load_file.
  */
  public class LoadHandler implements Route {
 
@@ -29,9 +25,9 @@ package server.csvapi;
    *
    * @param storage - class that stores loaded csv information
    */
-  public LoadHandler(Storage storage) {
-    this.storage = storage;
-  }
+  //public LoadHandler(Storage storage) {
+   // this.storage = storage;
+  //}
 
   /**
    * Handles the request sent from server.
@@ -70,7 +66,7 @@ package server.csvapi;
     }
 
     List<List<String>> csvList = new ArrayList<>();
-
+    /*
     try { // prepare a 2D Arraylist to represent the CSV with CSV parser
       Parser<ArrayList<List<String>>> parser = new Parser<>(new FileReader(filepath),
           new CSVToList(), hasHeader);
@@ -87,8 +83,8 @@ package server.csvapi;
       map.put("result", "error_bad_request");
       map.put("message", "Failure in processing file.");
     }
-//    return APIUtilities.toJson(map); // serialize to JSON for output
-  }
-
+//    return APIUtilities.toJson(map); // serialize to JSON for output*/
+    return filepath;
+  }}
 
 // }

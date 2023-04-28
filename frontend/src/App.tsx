@@ -10,7 +10,7 @@ import Login from "./pages/Auth/login";
 import { ChakraBaseProvider } from "@chakra-ui/react";
 import theme from "../src/theme";
 import Layout from "./components/Layout";
-
+import IndividualPrinterPage from "./pages/PrintersPage/IndividualPrinterPage";
 function App() {
   return (
     <ChakraBaseProvider theme={theme}>
@@ -21,6 +21,7 @@ function App() {
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/queue" element={<QueuePage />} />
             <Route path="/printers" element={<PrintersPage />} />
+            <Route path="/printer/:id" element={<IndividualPrinterPage />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/auth/login" element={<Login />} />
           </Routes>

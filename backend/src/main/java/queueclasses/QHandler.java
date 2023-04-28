@@ -3,6 +3,7 @@ package queueclasses;
 import static queueclasses.Status.AVAILABLE;
 import static queueclasses.Status.PENDING;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,7 +185,11 @@ public class QHandler implements Route {
       printerToUpdate.setFilament(filament);
     }
     if (status != null) {
-      printerToUpdate.setStatus(status);
+      if (!printerToUpdate.setStatus(status)) { // invalid status
+        map.put("result", "error_bad_request");
+        map.put("message", "Status provided is invalid.");
+        return APIUtilities.toJson(map); // serialize to JSON for output
+      }
     }
     map.put("result", "success");
     return APIUtilities.toJson(map); // serialize to JSON for output
@@ -195,7 +200,7 @@ public class QHandler implements Route {
    * @param request Should hold a printerName param
    * @return a success or failure message
    */
-  private String rejectPrinter(Request request) {
+  public String rejectPrinter(Request request) {
     String printerName = request.queryParams("printerName");
     Map<String, Object> message = new HashMap<>();
     // error handling - user/contact not provided
@@ -204,26 +209,23 @@ public class QHandler implements Route {
       message.put("message", "No printer provided");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
-    Printer printer = printers.get(printerName);
+    Printer printer = this.printers.get(printerName);
     if (printer == null){
       message.put("result", "error_bad_request");
       message.put("message", "printer " + printerName + " does not exist");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
     switch (printer.getStatus()) {
-      case BUSY:
-      case PENDING:
+      case BUSY, PENDING -> {
         printer.setStatus("available");
         printer.setTimeStarted(LocalTime.now());
         message.put("result", "success");
         message.put("message", "printer " + printerName + " is now available");
-        break;
-      case MAINTENANCE:
-      case RESERVED:
-      case AVAILABLE:
+      }
+      case MAINTENANCE, RESERVED, AVAILABLE -> {
         message.put("result", "error_bad_request");
         message.put("message", "printer " + printerName + " is not busy or reserved");
-        break;
+      }
     }
     return APIUtilities.toJson(message); // serialize to JSON for output
   }
@@ -233,7 +235,7 @@ public class QHandler implements Route {
    * @param request should contain a printerName parameter
    * @return a success or failure message
    */
-  private String claim(Request request) {
+  public String claim(Request request) {
     String printerName = request.queryParams("printerName");
     Map<String, Object> message = new HashMap<>();
     // error handling - user/contact not provided
@@ -261,11 +263,11 @@ public class QHandler implements Route {
     return APIUtilities.toJson(message); // serialize to JSON for output
   }
 
-  private void assignPrinters() {
+  public void assignPrinters() {
     for (Printer printer : this.printers.values()) {
       if (printer.getStatus() == AVAILABLE && !(this.printQ.getQueue().isEmpty())) {
         printer.setCurrentJob(this.printQ.dequeue());
-        printer.setStatus("busy");
+        printer.setStatus("pending");
         printer.setTimeStarted(LocalTime.now());
       }
     }

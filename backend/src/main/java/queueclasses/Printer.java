@@ -39,14 +39,17 @@ public class Printer{
    * setter for the status parameter
    * @param status the string form of the new status
    */
-  public void setStatus(String status) {
+  public boolean setStatus(String status) {
+    boolean ret = true;
     switch (status) {
       case "available" -> this.status = Status.AVAILABLE;
       case "busy" -> this.status = Status.BUSY;
       case "pending" -> this.status = Status.PENDING;
       case "maintenance" -> this.status = Status.MAINTENANCE;
       case "reserved" -> this.status = Status.RESERVED;
+      default -> ret = false;
     }
+    return ret; // false if status was invalid
   }
   /**
    * setter for the currentJob parameter

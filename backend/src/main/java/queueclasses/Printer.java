@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class Printer{
   private String name;
-  private String filament;
+  public String filament;
   private Status status;
   private LocalTime timeStarted;
   private Optional<Job> currentJob;
@@ -73,25 +73,3 @@ public class Printer{
 
 }
 
-/**
- * possible statuses:
- * AVAILABLE: the printer is not in use, and can have a new job assigned to it. if the printer is
- * in this state, currentJob should be empty
- *
- * BUSY: the printer is currently working on a job. currentJob should NOT be empty
- *
- * PENDING: the printer has a job assigned to it, but that job has not been started yet. if
- * the printer goes a while without the job being started, the printer should be forfeited and set
- * to available. in this state, currentJob should NOT be empty
- *
- * MAINTENANCE: the printer is down for maintenance
- *
- * RESERVED: bdw monitors have removed the printer from circulation for some reason
- */
-enum Status {
-  AVAILABLE,
-  BUSY,
-  PENDING,
-  MAINTENANCE,
-  RESERVED
-}

@@ -16,7 +16,7 @@ import java.time.Duration;
 
 public class QHandler implements Route {
   public JobQueue printQ;
-  HashMap<String, Printer> printers;
+  public HashMap<String, Printer> printers;
   public QHandler(){
     this.printQ = new JobQueue();
     this.printers = new HashMap<>();

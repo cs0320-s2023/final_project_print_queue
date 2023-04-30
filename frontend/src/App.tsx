@@ -10,22 +10,25 @@ import Login from "./pages/Auth/login";
 import { ChakraBaseProvider } from "@chakra-ui/react";
 import theme from "../src/theme";
 import Layout from "./components/Layout";
+import { AuthorizationProvider } from "./utils/AuthorizationProvider";
 
 function App() {
   return (
     <ChakraBaseProvider theme={theme}>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/queue" element={<QueuePage />} />
-            <Route path="/printers" element={<PrintersPage />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/auth/login" element={<Login />} />
-          </Routes>
-        </Layout>
-      </Router>
+      <AuthorizationProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/queue" element={<QueuePage />} />
+              <Route path="/printers" element={<PrintersPage />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/auth/login" element={<Login />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </AuthorizationProvider>
     </ChakraBaseProvider>
   );
 }

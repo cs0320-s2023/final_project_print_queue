@@ -20,12 +20,16 @@ import QueueItems from "../../Mocks/QueueMock";
 import QueueCard from "./QueueCard";
 import EmptyQueueAnimation from "./EmptyAnimation";
 import JoinQueueModal from "./JoinQueueModal";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../utils/firebase";
+import { useAuthorization } from "../../utils/useAuthorization";
 
 const emptyQueue = [];
 
 function QueuePage() {
-  // Used by Modal popup
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Used by Modal popup
+  const [user, loading] = useAuthState(auth);
+  const { authorizationRole, setAuthorizationRole } = useAuthorization();
 
   const handleJoinQueue = () => {
     onOpen();

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Button,
@@ -14,12 +13,16 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { IUser } from "../../utils/UserService";
+import UserDataService from "../../utils/UserService";
 
 import animationData from "../../assets/hello.json";
 import Lottie from "react-lottie";
+import { useAuthorization } from "../../utils/useAuthorization";
 
 function Login() {
   const [user, loading] = useAuthState(auth);
+  const { authorizationRole, setAuthorizationRole } = useAuthorization();
 
   // Navigation: Redirects user to dashboard if they are already logged in
   const navigate = useNavigate();
@@ -34,8 +37,19 @@ function Login() {
   const GoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      const user: IUser = {
+        displayName: result.user.displayName,
+        email: result.user.email,
+        role: "user",
+      };
+      // Updates existing user or adds new user to firebase auth
+      UserDataService.create(user, result.user.uid);
+      // Sync Authorization Context with current Users Auth Role
+      UserDataService.syncUserAuthorizationRole(
+        result.user.uid,
+        setAuthorizationRole
+      );
       navigate("/profile");
-      console.log(result.user);
     } catch (error) {
       console.log("error");
     }

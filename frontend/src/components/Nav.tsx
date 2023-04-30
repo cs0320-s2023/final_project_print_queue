@@ -15,6 +15,7 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../utils/firebase";
 import NavLink from "./NavLink";
+import { useAuthorization } from "../utils/useAuthorization";
 
 const navItems = [
   {
@@ -33,6 +34,7 @@ const navItems = [
 
 function Nav() {
   const [user, loading] = useAuthState(auth);
+  const { authorizationRole, setAuthorizationRole } = useAuthorization();
 
   const location = useLocation();
   const hideNavbarPaths = ["/auth/login", "/auth/signup"];
@@ -89,7 +91,10 @@ function Nav() {
               <MenuItem
                 as={ReactRouterLink}
                 to="/"
-                onClick={() => auth.signOut()}
+                onClick={() => {
+                  setAuthorizationRole("viewer");
+                  auth.signOut();
+                }}
               >
                 Sign Out
               </MenuItem>

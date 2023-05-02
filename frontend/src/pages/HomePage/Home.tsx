@@ -1,24 +1,36 @@
-import { useAuthorization } from "../../utils/useAuthorization";
+import {
+  PermissionValues,
+  PermissionsProvider,
+} from "../../utils/Permissions/PermissionProvider";
+
+import Restricted from "../../utils/Permissions/Restricted";
+import { useAuthorization } from "../../utils/Authorization/useAuthorization";
+import { determineUserRole } from "../../utils/Permissions/determineUserPermissions";
 
 function HomePage() {
-  const { authorizationRole, setAuthorizationRole } = useAuthorization();
+  const { authorizationRole } = useAuthorization();
   console.log(authorizationRole);
-  const determineUserRole = () => {
-    switch (authorizationRole) {
-      case "user":
-        return "Authenticated User";
 
-      case "admin":
-        return "Admin";
-      case "viewer":
-        return "Viewer";
-
-      default:
-        return "Viewer";
-    }
-  };
-
-  return <p>User is a {determineUserRole()}</p>;
+  return (
+    <>
+      {authorizationRole && (
+        <PermissionsProvider permissions={determineUserRole(authorizationRole)}>
+          <div>
+            <p>Everyone Can see</p>
+            <Restricted to={PermissionValues.delete}>
+              <p>Admin Can see</p>
+            </Restricted>
+            <Restricted to={PermissionValues.dev}>
+              <p>Dev Permission</p>
+            </Restricted>
+            <Restricted to={PermissionValues.add}>
+              <p>Authenticated Can see</p>
+            </Restricted>
+          </div>
+        </PermissionsProvider>
+      )}
+    </>
+  );
 }
 
 export default HomePage;

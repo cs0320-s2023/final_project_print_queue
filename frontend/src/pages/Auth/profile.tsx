@@ -1,7 +1,7 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../utils/firebase";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useAuthorization } from "../../utils/useAuthorization";
+import { useAuthorization } from "../../utils/Authorization/useAuthorization";
 
 function Profile() {
   const [user, loading] = useAuthState(auth);
@@ -18,6 +18,7 @@ function Profile() {
         <h1>User Profile Page</h1>
         <button
           onClick={() => {
+            localStorage.setItem("authorization", "viewer");
             setAuthorizationRole("viewer");
             auth.signOut();
           }}

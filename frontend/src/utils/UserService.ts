@@ -1,5 +1,15 @@
 // import { , push } from "firebase/database";
-import { getDatabase, onValue, ref, set } from "firebase/database";
+import {
+  child,
+  get,
+  getDatabase,
+  onValue,
+  ref,
+  set,
+  update,
+} from "firebase/database";
+import { IUserObject } from "../pages/AdminDash";
+import { AuthRoles } from "./Permissions/determineUserPermissions";
 
 export interface IUser {
   displayName: string | null;
@@ -8,14 +18,13 @@ export interface IUser {
 }
 
 const db = getDatabase();
+const usersReference = ref(db, "users");
 class UserDataService {
-  getAll = () => {
-    const usersReferance = ref(db, "users");
-    const users = onValue(usersReferance, (snapshot) => {
-      const data = snapshot.val();
-      console.log(data);
-
-      return data;
+  getAll = (setUsers: React.Dispatch<React.SetStateAction<IUserObject>>) => {
+    onValue(usersReference, (snapshot) => {
+      let users = snapshot.val();
+      setUsers(users);
+      console.log(users);
     });
 
     return ref(db, "users/");
@@ -27,6 +36,18 @@ class UserDataService {
     });
   };
 
+  exists = (uid: string) => {
+    let userExists = get(child(usersReference, uid))
+      .then((snapshot) => {
+        return snapshot.exists() ? true : false;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    return userExists;
+  };
+
   // Following was an attempt to get return authrole from real-time database
   // async getUserAuthorization(uid: string): Promise<string> {
   //   const db = getDatabase();
@@ -35,14 +56,43 @@ class UserDataService {
   //   return user.role;
   // }
 
+  update = (uid: string, updatedUser: IUser) => {
+    console.log("IN UPDATE Function");
+    update(ref(db, "users/" + uid), updatedUser)
+      .then(() => {
+        console.log("Success");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   syncUserAuthorizationRole = (
     uid: string,
-    setAuthorization: React.Dispatch<React.SetStateAction<string | null>>
+    setAuthorization: React.Dispatch<React.SetStateAction<string>>
   ) => {
-    onValue(ref(db, "users/" + uid), (snapshot) => {
-      const data = snapshot.val();
-      setAuthorization(data.role);
-    });
+    // onValue(ref(db, "users/" + uid), (snapshot) => {
+    //   const authRole = snapshot.val();
+    //   setAuthorization(authRole.role);
+    //   return authRole;
+    // });
+    // const dbReferance = ref(db, "users");
+
+    let role = get(child(usersReference, uid))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const authRole = snapshot.val();
+          setAuthorization(authRole.role);
+          return authRole.role;
+        } else {
+          console.log("No data available");
+          return "viewer";
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return role;
   };
 }
 

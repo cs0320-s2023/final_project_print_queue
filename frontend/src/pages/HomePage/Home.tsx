@@ -4,8 +4,8 @@ import {
 } from "../../utils/Permissions/PermissionProvider";
 
 import Restricted from "../../utils/Permissions/Restricted";
-import { useAuthorization } from "../../utils/Authorization/useAuthorization";
 import { determineUserRole } from "../../utils/Permissions/determineUserPermissions";
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
 
 function HomePage() {
   const { authorizationRole } = useAuthorization();

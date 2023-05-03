@@ -15,7 +15,7 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../utils/firebase";
 import NavLink from "./NavLink";
-import { useAuthorization } from "../utils/Authorization/useAuthorization";
+import { useAuthorization } from "../utils/hooks/useAuthorization";
 
 const navItems = [
   {

@@ -1,5 +1,5 @@
 import { Navigate } from "react-router";
-import { useAuthorization } from "../utils/Authorization/useAuthorization";
+import { useAuthorization } from "../utils/hooks/useAuthorization";
 
 interface Props {
   children: React.ReactNode;

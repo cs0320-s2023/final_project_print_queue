@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
+
 import {
-  Box,
   Button,
   Container,
   Flex,
@@ -12,27 +13,64 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import SmallPrinterCard from "./SmallPrinterCard";
-import printers from "../../Mocks/PrinterMocks";
+
+// Assets Imports
 import { FaUserCircle } from "react-icons/fa";
-import { IconContext } from "react-icons";
-import QueueItems from "../../Mocks/QueueMock";
-import QueueCard from "./QueueCard";
 import EmptyQueueAnimation from "./EmptyAnimation";
+
+// Components
+import SmallPrinterCard from "./SmallPrinterCard";
+import QueueCard from "./QueueCard";
 import JoinQueueModal from "./JoinQueueModal";
+import AlertModal from "./AlertModal";
+
+// Mock Data
+import printers from "../../Mocks/PrinterMocks";
+import QueueItems from "../../Mocks/QueueMock";
+
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../utils/firebase";
-import { useAuthorization } from "../../utils/useAuthorization";
-
-const emptyQueue = [];
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
+import { Job, Printer } from "../../utils/types";
+// import useFetch from "../../utils/hooks/useFetch";
 
 function QueuePage() {
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Used by Modal popup
+  const {
+    isOpen: isOpenJoinQueueModal,
+    onOpen: onOpenJoinQueueModal,
+    onClose: onCloseJoinQueueModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenAlertModal,
+    onOpen: onOpenAlertModal,
+    onClose: onCloseAlertModal,
+  } = useDisclosure();
+
   const [user, loading] = useAuthState(auth);
   const { authorizationRole, setAuthorizationRole } = useAuthorization();
+  const [queueItems, setQueueItems] = useState<Job[]>([]);
+  const [printerItems, setPrinterItems] = useState<Printer[]>([]);
+
+  // const base = "http://localhost:3232/qHandle?command=";
+  // const getState = "getState";
+  // // console.log(base + getState);
+  // const { data, error } = useFetch<Job[]>(base + getState);
+  // console.log(data);
+
+  useEffect(() => {
+    setQueueItems(QueueItems);
+    setPrinterItems(printers);
+  }, [queueItems]);
 
   const handleJoinQueue = () => {
-    onOpen();
+    if (user === null) {
+      onOpenAlertModal();
+    } else {
+      // TODO: Actually Call the Enqueue Method to the Backend
+
+      onOpenJoinQueueModal();
+    }
   };
 
   return (
@@ -76,12 +114,12 @@ function QueuePage() {
               <Text>{QueueItems.length} people</Text>
             </HStack>
             <Flex flexWrap="wrap">
-              {printers.map((printer) => (
+              {printerItems.map((printer) => (
                 <SmallPrinterCard
-                  key={printer.id}
+                  key={printer.name}
                   name={printer.name}
                   status={printer.status}
-                  time={printer.time}
+                  timeStarted={printer.timeStarted}
                 />
               ))}
             </Flex>
@@ -91,7 +129,7 @@ function QueuePage() {
               <Heading as="h2" size="lg">
                 <Text>Queue</Text>
               </Heading>
-              <Button colorScheme="orange" size="md" onClick={() => onOpen()}>
+              <Button colorScheme="orange" size="md" onClick={handleJoinQueue}>
                 Join Queue
               </Button>
             </HStack>
@@ -100,13 +138,22 @@ function QueuePage() {
             ) : (
               <VStack spacing={4}>
                 {QueueItems.map((item) => (
-                  <QueueCard key={item.id} {...item} />
+                  <QueueCard key={item.contact} {...item} />
                 ))}
               </VStack>
             )}
           </GridItem>
         </Grid>
-        <JoinQueueModal onClose={onClose} isOpen={isOpen} />
+        <JoinQueueModal
+          onClose={onCloseJoinQueueModal}
+          isOpen={isOpenJoinQueueModal}
+          username={
+            user?.displayName === null || user?.displayName === undefined
+              ? "anonymous"
+              : user.displayName
+          }
+        />
+        <AlertModal onClose={onCloseAlertModal} isOpen={isOpenAlertModal} />
       </Container>
     </>
   );

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AuthorizationContext } from "./AuthorizationProvider";
+import AuthorizationContext from "../Authorization/AuthorizationContext";
 
 export const useAuthorization = () => {
   const authorizationContext = useContext(AuthorizationContext);

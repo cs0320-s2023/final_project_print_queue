@@ -17,25 +17,38 @@ import {
   RadioGroup,
   Select,
   Text,
+  Toast,
   VStack,
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import {
+  EnqueueServerResponse,
+  ServerErrorResponse,
+  isEnqueueServerResponse,
+  isServerErrorResponse,
+} from "../../utils/types";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../utils/firebase";
 
 interface QueueModalProps {
   onClose: () => void;
   isOpen: boolean;
+  username: string;
 }
 
-function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
+const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
+
+function JoinQueueModal({ onClose, isOpen, username }: QueueModalProps) {
+  const [user] = useAuthState(auth);
   const [contactState, setContactState] = useState("email");
   const toast = useToast();
 
   const [formState, setFormState] = useState({
     projectName: "",
-    estimatedPrintTime: "",
+    printTime: "PT5H",
     printerPreference: "",
-    contactMethod: "",
+    contact: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,14 +59,32 @@ function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
     });
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
+    const url =
+      baseurl +
+      `user=${user?.displayName}&contact=${user?.email}&duration=${formState.printTime}`;
+
+    const enqueueResponse = await enqueue(url);
+    console.log(enqueueResponse);
+    if (enqueueResponse !== undefined) {
+      if (enqueueResponse.result === "success") {
+        toast({
+          title: `You have been added to the Queue.`,
+          position: "top",
+          status: "success",
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: `An Error Occured: Unfortunately you could not be added to the queue.`,
+          position: "top",
+          status: "error",
+          isClosable: true,
+        });
+      }
+    }
+
     onClose();
-    toast({
-      title: `You have been added to the Queue.`,
-      position: "top",
-      status: "success",
-      isClosable: true,
-    });
   };
 
   return (
@@ -107,5 +138,33 @@ function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
     </Modal>
   );
 }
+
+/**
+ * The equeue function makes a request to the Java qHandler in our backend.
+ * Calling this function will add a new job to the printQ.
+ *
+ * @param url String url with required url params to enqueue an job in the backend
+ * @returns JSON response either success of error.
+ */
+const enqueue = async (url: string) => {
+  try {
+    const response = await fetch(url);
+    const responseJson: EnqueueServerResponse | ServerErrorResponse =
+      await response.json();
+    // Using Type Predicate to veriy that responseJson is a ServerResponse.
+    if (isEnqueueServerResponse(responseJson)) {
+      return responseJson;
+    } else if (isServerErrorResponse(responseJson)) {
+      return responseJson;
+    } else {
+      console.log(
+        "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    return { result: "error" };
+  }
+};
 
 export default JoinQueueModal;

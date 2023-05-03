@@ -18,7 +18,7 @@ import UserDataService from "../../utils/UserService";
 
 import animationData from "../../assets/hello.json";
 import Lottie from "react-lottie";
-import { useAuthorization } from "../../utils/Authorization/useAuthorization";
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
 
 function Login() {
   const [user] = useAuthState(auth);

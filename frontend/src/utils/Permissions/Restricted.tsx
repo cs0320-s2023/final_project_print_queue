@@ -1,5 +1,5 @@
 import React from "react";
-import usePermission from "./usePermissions";
+import usePermission from "../hooks/usePermissions";
 import { PermissionValues } from "./PermissionProvider";
 
 type Props = {

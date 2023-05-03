@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import server.APIUtilities;
 import server.JobQueue;
 import spark.Request;
@@ -121,12 +122,14 @@ public class QHandler implements Route {
     String contact = request.queryParams("contact");
     String duration = request.queryParams("duration");
     String time = LocalTime.now().toString();
-    this.printQ.enqueue(new Job(user, contact, duration, time));
+    String ID = UUID.randomUUID().toString();
+    this.printQ.enqueue(new Job(user, contact, duration, time, ID));
     Map<String, Object> map = new HashMap<>();
     map.put("user", user);
     map.put("contact", contact);
     map.put("duration", duration);
     map.put("result", "success");
+    map.put("ID", ID);
     return APIUtilities.toJson(map); // serialize to JSON for output
   }
 

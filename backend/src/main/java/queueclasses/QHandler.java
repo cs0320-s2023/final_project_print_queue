@@ -3,8 +3,11 @@ package queueclasses;
 import static queueclasses.Status.AVAILABLE;
 import static queueclasses.Status.PENDING;
 
+
 import java.io.IOException;
+import com.squareup.moshi.Moshi;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,14 +25,14 @@ public class QHandler implements Route {
     this.printQ = new JobQueue();
     this.printers = new HashMap<>();
     // put real name later
-    this.printers.put("p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p2", new Printer("p2", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p3", new Printer("p3", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p4", new Printer("p4", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p5", new Printer("p5", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
-    this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now(), Optional.empty()));
+    this.printers.put("p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p2", new Printer("p2", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p3", new Printer("p3", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p4", new Printer("p4", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p5", new Printer("p5", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
   }
   /**
    * Used for testing
@@ -92,11 +95,20 @@ public class QHandler implements Route {
    * @return the serialization of printQ and printers
    */
   private String getState(Request request){
-    Map toSerialize = new HashMap();
-    toSerialize.put("printQ", printQ);
-    toSerialize.put("printers", printers);
+    Map<String, Object> toSerialize = new HashMap<>();
+    System.out.println("a");
+    toSerialize.put("printQ", printQ.getQueue());
+    toSerialize.put("printers", printers.values());
     toSerialize.put("result", "success");
-    return APIUtilities.toJson(toSerialize); // serialize to JSON for output
+    //toSerialize.put("test job", new Job("alice", "a@gmail.com",
+      //  Duration.of(5, ChronoUnit.MINUTES), LocalTime.now()));
+    System.out.println("b");
+    try {
+      //return new Moshi.Builder().build().adapter(Duration.class).toJson(Duration.of(5, ChronoUnit.MINUTES));
+      return APIUtilities.toJson(toSerialize);
+    } catch (Exception e){
+      return e.getMessage();
+    }
   }
 
   /**
@@ -108,9 +120,8 @@ public class QHandler implements Route {
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
     String duration = request.queryParams("duration");
-    LocalTime time = LocalTime.now();
-    Duration printDuration = Duration.parse(duration);
-    this.printQ.enqueue(new Job(user, contact, printDuration, time));
+    String time = LocalTime.now().toString();
+    this.printQ.enqueue(new Job(user, contact, duration, time));
     Map<String, Object> map = new HashMap<>();
     map.put("user", user);
     map.put("contact", contact);
@@ -180,7 +191,7 @@ public class QHandler implements Route {
     // now, assuming we have a valid printer, filament and/or status to update
 
     //updates the start time
-    printerToUpdate.setTimeStarted(LocalTime.now());
+    printerToUpdate.setTimeStarted(LocalTime.now().toString());
     if (filament != null) {
       printerToUpdate.setFilament(filament);
     }
@@ -218,7 +229,8 @@ public class QHandler implements Route {
     switch (printer.getStatus()) {
       case BUSY, PENDING -> {
         printer.setStatus("available");
-        printer.setTimeStarted(LocalTime.now());
+        printer.setCurrentJob(null);
+        printer.setTimeStarted(LocalTime.now().toString());
         message.put("result", "success");
         message.put("message", "printer " + printerName + " is now available");
       }
@@ -252,7 +264,7 @@ public class QHandler implements Route {
     }
     if (printer.getStatus() == PENDING){
       printer.setStatus("busy");
-      printer.setTimeStarted(LocalTime.now());
+      printer.setTimeStarted(LocalTime.now().toString());
       message.put("result", "success");
       message.put("message", "printer " + printerName + " claimed");
       return APIUtilities.toJson(message); // serialize to JSON for output
@@ -268,7 +280,7 @@ public class QHandler implements Route {
       if (printer.getStatus() == AVAILABLE && !(this.printQ.getQueue().isEmpty())) {
         printer.setCurrentJob(this.printQ.dequeue());
         printer.setStatus("pending");
-        printer.setTimeStarted(LocalTime.now());
+        printer.setTimeStarted(LocalTime.now().toString());
       }
     }
   }

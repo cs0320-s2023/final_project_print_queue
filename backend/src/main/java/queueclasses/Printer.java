@@ -2,13 +2,14 @@ package queueclasses;
 
 import java.time.LocalTime;
 import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public class Printer{
   private String name;
   public String filament;
   private Status status;
-  private LocalTime timeStarted;
-  private Optional<Job> currentJob;
+  private String timeStarted;
+  private @Nullable Job currentJob;
 
   /**
    *
@@ -16,15 +17,13 @@ public class Printer{
    * @param filament description of the currently loaded status
    * @param status the state of the printer. options described more fully in hte Status enum
    * @param timeStarted when the printer last changed state
-   * @param currentJob The job the printer is currently busy/pending with, if any
    */
-  public Printer(String name, String filament, Status status, LocalTime timeStarted,
-      Optional<Job> currentJob){
+  public Printer(String name, String filament, Status status, String timeStarted){
     this.name = name;
     this.filament = filament;
     this.status = status;
     this.timeStarted = timeStarted;
-    this.currentJob = Optional.empty();
+    this.currentJob = null;
   }
 
   /**
@@ -56,13 +55,13 @@ public class Printer{
    * @param currentJob the new Optional<job>
    */
   public void setCurrentJob(Job currentJob) {
-    this.currentJob = Optional.of(currentJob);
+    this.currentJob = currentJob;
   }
   /**
    * setter for the timeStarted parameter
    * @param time the new time
    */
-  public void setTimeStarted(LocalTime time){
+  public void setTimeStarted(String time){
     this.timeStarted = time;
   }
 

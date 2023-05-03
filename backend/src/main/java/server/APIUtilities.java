@@ -1,13 +1,18 @@
 package server;
 
 import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonReader;
+import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Map;
 import okio.Buffer;
+import org.jetbrains.annotations.Nullable;
 
 /** Utilities class that has a static toJson method that every handler in server uses. */
 public class APIUtilities {
@@ -55,7 +60,11 @@ public class APIUtilities {
    * @return String containing the serialized Json.
    */
   public static String toJson(Map<String, Object> map) {
-    Moshi moshi = new Moshi.Builder().build();
+    //Moshi preMoshi = new Moshi.Builder().build();
+    Moshi moshi = new Moshi.Builder()
+        //.add(preMoshi.adapter(LocalTime.class))
+        //.add(preMoshi.adapter(Duration.class))
+        .build();
     JsonAdapter<Map<String, Object>> jsonAdapter =
         moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
     return jsonAdapter.toJson(map);

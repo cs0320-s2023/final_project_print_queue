@@ -11,4 +11,4 @@ import java.time.Duration;
  *                  from the Prusa Slicer estimate, but not checked
  * @param timeQueued recorded automatically
  */
-public record Job(String user, String contact, Duration printTime, LocalTime timeQueued) {}
+public record Job(String user, String contact, String printTime, String timeQueued) {}

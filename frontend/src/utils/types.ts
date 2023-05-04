@@ -5,24 +5,24 @@ export interface Job {
   printTime: string;
   timeQueued: string;
   // status: string;
-  // id: string; // This feild hasn't yet been added
+  JobID: string; // This feild hasn't yet been added
   // printer:
 }
 
 export interface Printer {
   name: string;
   filament: string;
-  status: string;
+  status: Status;
   timeStarted: string;
   currentJob?: Job;
 }
 
 export enum Status {
-  AVAILABLE = "available",
-  BUSY = "busy",
-  PENDING = "pending",
-  MAINTENANCE = "maintenance",
-  RESERVE = "reserved",
+  AVAILABLE = "AVAILABLE",
+  BUSY = "BUSY",
+  PENDING = "PENDING",
+  MAINTENANCE = "MAINTENANCE",
+  RESERVE = "RESERVE",
 }
 
 /**
@@ -61,5 +61,76 @@ export function isEnqueueServerResponse(
   if (!("contact" in rjson)) return false;
   if (!("duration" in rjson)) return false;
   if (!("result" in rjson)) return false;
+  return true;
+}
+
+/**
+ * GetStateServerResponse Type and corresponding type gaurd funciton for
+ * checking if a given object is a GetStateServerResponse
+ */
+
+export interface GetStateServerResponse {
+  printQ: Job[];
+  printers: Printer[];
+  result: string;
+}
+
+export function isGetStateServerResponse(
+  rjson: any
+): rjson is GetStateServerResponse {
+  if (!("printQ" in rjson)) return false;
+  if (!("printers" in rjson)) return false;
+  if (!("result" in rjson)) return false;
+  return true;
+}
+
+/**
+ * rejectPrinterServerResponse Type and corresponding type gaurd funciton for
+ * checking if a given object is a rejectPrinterServerResponse
+ */
+export interface RejectPrinterServerResponse {
+  result: string;
+  message: string;
+}
+
+export function isRejectPrinterServerResponse(
+  rjson: any
+): rjson is RejectPrinterServerResponse {
+  if (!("result" in rjson)) return false;
+  if (!("message" in rjson)) return false;
+  return true;
+}
+
+/**
+ * rejectJobServerResponse Type and corresponding type gaurd funciton for
+ * checking if a given object is a rejectPrinterServerResponse
+ */
+export interface RejectFromQueueServerResponse {
+  result: string;
+  message: string;
+}
+
+export function isRejectFromQueueServerResponse(
+  rjson: any
+): rjson is RejectFromQueueServerResponse {
+  if (!("result" in rjson)) return false;
+  if (!("message" in rjson)) return false;
+  return true;
+}
+
+/**
+ * ClaimPrinterServerResponse Type and corresponding type gaurd funciton for
+ * checking if a given object is a rejectPrinterServerResponse
+ */
+export interface ClaimPrinterServerResponse {
+  result: string;
+  message: string;
+}
+
+export function isClaimPrinterServerResponse(
+  rjson: any
+): rjson is RejectFromQueueServerResponse {
+  if (!("result" in rjson)) return false;
+  if (!("message" in rjson)) return false;
   return true;
 }

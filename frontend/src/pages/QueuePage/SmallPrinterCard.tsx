@@ -4,9 +4,20 @@ import { Status } from "../../utils/types";
 
 interface SmallPrinterProps {
   name: string;
-  status: string;
+  status: Status;
   timeStarted: string;
 }
+
+const printerToDisplayName: { [name: string]: string } = {
+  p1: "Printer 1",
+  p2: "Printer 2",
+  p3: "Printer 3",
+  p4: "Printer 4",
+  p5: "Printer 5",
+  p6: "Printer 6",
+  p7: "Printer 7",
+  p8: "Printer 8",
+};
 
 function SmallPrinterCard({ name, status, timeStarted }: SmallPrinterProps) {
   const renderStatus = () => {
@@ -29,7 +40,7 @@ function SmallPrinterCard({ name, status, timeStarted }: SmallPrinterProps) {
       <Image src={printer} alt="3D Printer Icon" boxSize="50px" />
       <VStack alignItems={"left"}>
         <Heading as="h2" size="md">
-          <Text>{name}</Text>
+          <Text>{printerToDisplayName[name]}</Text>
         </Heading>
         {renderStatus()}
       </VStack>

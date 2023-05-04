@@ -8,6 +8,7 @@ import {
   GridItem,
   HStack,
   Heading,
+  Spinner,
   Stack,
   Text,
   VStack,
@@ -24,15 +25,16 @@ import QueueCard from "./QueueCard";
 import JoinQueueModal from "./JoinQueueModal";
 import AlertModal from "./AlertModal";
 
-// Mock Data
-import printers from "../../Mocks/PrinterMocks";
-import QueueItems from "../../Mocks/QueueMock";
-
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../utils/firebase";
-import { useAuthorization } from "../../utils/hooks/useAuthorization";
-import { Job, Printer } from "../../utils/types";
-// import useFetch from "../../utils/hooks/useFetch";
+import {
+  GetStateServerResponse,
+  Job,
+  Printer,
+  ServerErrorResponse,
+  isGetStateServerResponse,
+  isServerErrorResponse,
+} from "../../utils/types";
 
 function QueuePage() {
   const {
@@ -47,31 +49,53 @@ function QueuePage() {
     onClose: onCloseAlertModal,
   } = useDisclosure();
 
-  const [user, loading] = useAuthState(auth);
-  const { authorizationRole, setAuthorizationRole } = useAuthorization();
+  const [user] = useAuthState(auth);
   const [queueItems, setQueueItems] = useState<Job[]>([]);
   const [printerItems, setPrinterItems] = useState<Printer[]>([]);
 
-  // const base = "http://localhost:3232/qHandle?command=";
-  // const getState = "getState";
-  // // console.log(base + getState);
-  // const { data, error } = useFetch<Job[]>(base + getState);
-  // console.log(data);
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [update, setUpdate] = useState<boolean>(true);
 
   useEffect(() => {
-    setQueueItems(QueueItems);
-    setPrinterItems(printers);
-  }, [queueItems]);
+    const url = "http://localhost:3232/qHandle?command=getState";
+    const fetchData = async () => {
+      setFetching(true);
+      try {
+        const response = await fetch(url);
+        const responseJson: GetStateServerResponse | ServerErrorResponse =
+          await response.json();
+        if (isGetStateServerResponse(responseJson)) {
+          setPrinterItems(responseJson.printers);
+          setQueueItems(responseJson.printQ);
+        } else if (isServerErrorResponse(responseJson)) {
+          setError(true);
+        } else {
+          console.log(
+            "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
+          );
+        }
+      } catch (error) {
+        setError(true);
+        console.log(error);
+      }
+      setFetching(false);
+    };
+    fetchData();
+    setUpdate(false);
+  }, [update]);
 
   const handleJoinQueue = () => {
     if (user === null) {
       onOpenAlertModal();
     } else {
-      // TODO: Actually Call the Enqueue Method to the Backend
-
       onOpenJoinQueueModal();
     }
   };
+
+  if (error) {
+    return <EmptyQueueAnimation />;
+  }
 
   return (
     <>
@@ -105,44 +129,87 @@ function QueuePage() {
               </Text>
             </Stack>
           </GridItem>
-          <GridItem gridColumn={"1 / 2"}>
-            <Heading as="h2" size="lg">
-              <Text>About</Text>
-            </Heading>
-            <HStack py={2}>
-              <FaUserCircle size="40px" />
-              <Text>{QueueItems.length} people</Text>
-            </HStack>
-            <Flex flexWrap="wrap">
-              {printerItems.map((printer) => (
-                <SmallPrinterCard
-                  key={printer.name}
-                  name={printer.name}
-                  status={printer.status}
-                  timeStarted={printer.timeStarted}
-                />
-              ))}
-            </Flex>
-          </GridItem>
-          <GridItem gridColumn={"2 / 4"}>
-            <HStack justify={"space-between"} pb={4}>
-              <Heading as="h2" size="lg">
-                <Text>Queue</Text>
-              </Heading>
-              <Button colorScheme="orange" size="md" onClick={handleJoinQueue}>
-                Join Queue
-              </Button>
-            </HStack>
-            {QueueItems.length === 0 ? (
-              <EmptyQueueAnimation />
-            ) : (
-              <VStack spacing={4}>
-                {QueueItems.map((item) => (
-                  <QueueCard key={item.contact} {...item} />
-                ))}
-              </VStack>
-            )}
-          </GridItem>
+          {fetching ? (
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+          ) : (
+            <>
+              <GridItem gridColumn={"1 / 2"}>
+                <Heading as="h2" size="lg">
+                  <Text>About</Text>
+                </Heading>
+                <HStack py={2}>
+                  <FaUserCircle size="40px" />
+                  <Text>
+                    {/* Hack to get # of current users. This was caused by a backend implementation decision were users
+                      who are "Printing" are no longer stored in our Queue Data Stucture.*/}
+                    {queueItems.length +
+                      printerItems.filter((printer) => printer.currentJob)
+                        .length}{" "}
+                    people
+                  </Text>
+                </HStack>
+                <Flex flexWrap="wrap">
+                  {printerItems.map((printer) => (
+                    <SmallPrinterCard
+                      key={printer.name}
+                      name={printer.name}
+                      status={printer.status}
+                      timeStarted={printer.timeStarted}
+                    />
+                  ))}
+                </Flex>
+              </GridItem>
+              <GridItem gridColumn={"2 / 4"}>
+                <HStack justify={"space-between"} pb={4}>
+                  <Heading as="h2" size="lg">
+                    <Text>Queue</Text>
+                  </Heading>
+                  <Button
+                    colorScheme="orange"
+                    size="md"
+                    onClick={handleJoinQueue}
+                  >
+                    Join Queue
+                  </Button>
+                </HStack>
+                {queueItems.length === 0 &&
+                printerItems.filter((printer) => printer.currentJob).length ===
+                  0 ? (
+                  <EmptyQueueAnimation />
+                ) : (
+                  <VStack spacing={4}>
+                    {printerItems.map((printer) => {
+                      if (printer.currentJob) {
+                        return (
+                          <QueueCard
+                            key={printer.currentJob.JobID}
+                            job={{ ...printer.currentJob }}
+                            printer={printer}
+                            setUpdate={setUpdate}
+                          />
+                        );
+                      }
+                    })}
+                    {queueItems.map((job) => {
+                      return (
+                        <QueueCard
+                          key={job.JobID}
+                          job={{ ...job }}
+                          setUpdate={setUpdate}
+                        />
+                      );
+                    })}
+                  </VStack>
+                )}
+              </GridItem>
+            </>
+          )}
         </Grid>
         <JoinQueueModal
           onClose={onCloseJoinQueueModal}
@@ -152,6 +219,7 @@ function QueuePage() {
               ? "anonymous"
               : user.displayName
           }
+          setUpdate={setUpdate}
         />
         <AlertModal onClose={onCloseAlertModal} isOpen={isOpenAlertModal} />
       </Container>

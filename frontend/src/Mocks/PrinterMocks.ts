@@ -12,6 +12,7 @@ const printers: Printer[] = [
       printTime: "01:23:00",
       timeQueued: "01:23:00",
       uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
+      JobID: "2",
     },
   },
   {
@@ -25,6 +26,7 @@ const printers: Printer[] = [
       printTime: "01:23:00",
       timeQueued: "01:23:00",
       uid: "2",
+      JobID: "2",
     },
   },
   {
@@ -39,6 +41,7 @@ const printers: Printer[] = [
       timeQueued: "01:23:00",
       // status: "Printing",
       uid: "3",
+      JobID: "3",
     },
   },
   {
@@ -52,6 +55,7 @@ const printers: Printer[] = [
       printTime: "01:23:00",
       timeQueued: "01:23:00",
       uid: "4",
+      JobID: "4",
     },
   },
   {
@@ -65,6 +69,7 @@ const printers: Printer[] = [
       printTime: "01:23:00",
       timeQueued: "01:23:00",
       uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
+      JobID: "5",
     },
   },
   {

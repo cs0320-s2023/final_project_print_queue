@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import server.APIUtilities;
-import server.JobQueue;
 import spark.Request;
 import spark.Response;
 import spark.Route;

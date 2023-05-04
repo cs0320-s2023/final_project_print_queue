@@ -1,4 +1,4 @@
-package server;
+package queueclasses;
 
 import java.util.LinkedList;
 import java.util.Queue;

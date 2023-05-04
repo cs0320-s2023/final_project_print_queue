@@ -121,9 +121,10 @@ public class QHandler implements Route {
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
     String duration = request.queryParams("duration");
+    String imgUrl = request.queryParams("imgUrl");
     String time = LocalTime.now().toString();
     String ID = UUID.randomUUID().toString();
-    this.printQ.enqueue(new Job(user, contact, duration, time, ID));
+    this.printQ.enqueue(new Job(user, contact, duration, time, ID, imgUrl));
     Map<String, Object> map = new HashMap<>();
     map.put("user", user);
     map.put("contact", contact);

@@ -1,9 +1,12 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../utils/firebase";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
 
 function Profile() {
   const [user, loading] = useAuthState(auth);
+  const { authorizationRole, setAuthorizationRole } = useAuthorization();
+
   const navigate = useNavigate();
   if (loading) return <h1>Loading...</h1>;
   if (!user) {
@@ -13,7 +16,15 @@ function Profile() {
     return (
       <div>
         <h1>User Profile Page</h1>
-        <button onClick={() => auth.signOut()}>Sign Out</button>
+        <button
+          onClick={() => {
+            localStorage.setItem("authorization", "viewer");
+            setAuthorizationRole("viewer");
+            auth.signOut();
+          }}
+        >
+          Sign Out
+        </button>
       </div>
     );
   } else {

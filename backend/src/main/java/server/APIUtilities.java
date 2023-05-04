@@ -55,7 +55,12 @@ public class APIUtilities {
    * @return String containing the serialized Json.
    */
   public static String toJson(Map<String, Object> map) {
-    Moshi moshi = new Moshi.Builder().build();
+    // Moshi preMoshi = new Moshi.Builder().build();
+    Moshi moshi =
+        new Moshi.Builder()
+            // .add(preMoshi.adapter(LocalTime.class))
+            // .add(preMoshi.adapter(Duration.class))
+            .build();
     JsonAdapter<Map<String, Object>> jsonAdapter =
         moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
     return jsonAdapter.toJson(map);

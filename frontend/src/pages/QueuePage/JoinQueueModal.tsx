@@ -1,11 +1,10 @@
 import {
   Box,
   Button,
+  Container,
   FormControl,
   FormLabel,
   HStack,
-  Heading,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,29 +12,51 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Radio,
-  RadioGroup,
-  Select,
   Text,
-  VStack,
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import {
+  EnqueueServerResponse,
+  ServerErrorResponse,
+  isEnqueueServerResponse,
+  isServerErrorResponse,
+} from "../../utils/types";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../utils/firebase";
+import FileUpload from "../../components/FileUpload";
 
 interface QueueModalProps {
   onClose: () => void;
   isOpen: boolean;
+  username: string;
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
+export interface FormState {
+  projectName: string;
+  printTime: string;
+  printerPreference: string;
+  contact: string;
+}
+
+const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
+
+function JoinQueueModal({
+  onClose,
+  isOpen,
+  username,
+  setUpdate,
+}: QueueModalProps) {
+  const [user] = useAuthState(auth);
   const [contactState, setContactState] = useState("email");
   const toast = useToast();
 
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<FormState>({
     projectName: "",
-    estimatedPrintTime: "",
+    printTime: "",
     printerPreference: "",
-    contactMethod: "",
+    contact: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,40 +67,59 @@ function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
     });
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
+    const url =
+      baseurl +
+      `user=${user?.displayName}&contact=${user?.email}&duration=${formState.printTime}`;
+
+    const enqueueResponse = await enqueue(url);
+    console.log(enqueueResponse);
+    if (enqueueResponse !== undefined) {
+      if (enqueueResponse.result === "success") {
+        toast({
+          title: `You have been added to the Queue.`,
+          position: "top",
+          status: "success",
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: `An Error Occured: Unfortunately you could not be added to the queue at this time.`,
+          position: "top",
+          status: "error",
+          isClosable: true,
+        });
+      }
+    }
+    setUpdate(true);
     onClose();
-    toast({
-      title: `You have been added to the Queue.`,
-      position: "top",
-      status: "success",
-      isClosable: true,
-    });
   };
 
   return (
     <Modal onClose={onClose} size="xl" isOpen={isOpen}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Join the Queue 🎉</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack alignItems="start">
-            <FormControl>
+          <Text>
+            To join the queue please upload you .gcode file from the PrusaSlicer
+            in the area below. Please be aware that we do not store or save your
+            .gcode file for you! We ask you to upload your file so we can
+            extract the estimated print time of your project to better manage
+            the queue on our end. Happy Printinting!
+          </Text>
+          {/* <FormControl>
               <FormLabel>Project Name</FormLabel>
-              <Input placeholder="First name" onChange={handleInputChange} />
-            </FormControl>
-            <Select placeholder="Printer Preference" size="md">
-              <option value="none">None</option>
-              <option value="printer1">Printer 1</option>
-              <option value="printer2">Printer 2</option>
-              <option value="printer3">Printer 3</option>
-              <option value="printer4">Printer 4</option>
-              <option value="printer5">Printer 5</option>
-              <option value="printer6">Printer 6</option>
-              <option value="printer7">Printer 7</option>
-              <option value="printer8">Printer 8</option>
-            </Select>
-            <Box justifyItems="start" justifyContent="start">
+              <Input
+                placeholder="My 3D Printing Project"
+                onChange={handleInputChange}
+              />
+            </FormControl> */}
+          <Container py={5}>
+            <FileUpload formState={formState} setFormState={setFormState} />
+          </Container>
+          {/* <Box justifyItems="start" justifyContent="start">
               <Heading size="md:" py={3}>
                 <Text>Contact Preference</Text>
               </Heading>
@@ -90,8 +130,7 @@ function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
                   <Radio value="both">Both</Radio>
                 </HStack>
               </RadioGroup>
-            </Box>
-          </VStack>
+            </Box> */}
         </ModalBody>
         <ModalFooter>
           <HStack>
@@ -109,3 +148,31 @@ function JoinQueueModal({ onClose, isOpen }: QueueModalProps) {
 }
 
 export default JoinQueueModal;
+
+/**
+ * The equeue function makes a request to the Java qHandler in our backend.
+ * Calling this function will add a new job to the printQ.
+ *
+ * @param url String url with required url params to enqueue an job in the backend
+ * @returns JSON response either success of error.
+ */
+const enqueue = async (url: string) => {
+  try {
+    const response = await fetch(url);
+    const responseJson: EnqueueServerResponse | ServerErrorResponse =
+      await response.json();
+    // Using Type Predicate to veriy that responseJson is a ServerResponse.
+    if (isEnqueueServerResponse(responseJson)) {
+      return responseJson;
+    } else if (isServerErrorResponse(responseJson)) {
+      return responseJson;
+    } else {
+      console.log(
+        "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    return { result: "error" };
+  }
+};

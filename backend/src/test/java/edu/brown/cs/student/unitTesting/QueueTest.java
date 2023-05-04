@@ -1,24 +1,17 @@
 package edu.brown.cs.student.unitTesting;
 
 import edu.brown.cs.student.unitTesting.TestUtils.RequestStub;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import queueclasses.Job;
 import queueclasses.QHandler;
-import spark.Request;
-import spark.Spark;
 
 public class QueueTest {
 
   @Test
-  public void enqueueTest(){
+  public void enqueueTest() {
     QHandler handler = QHandler.fullyReserved();
     Map<String, String> req1 = new HashMap<>();
     Map<String, String> req2 = new HashMap<>();
@@ -45,20 +38,21 @@ public class QueueTest {
     Job third = handler.printQ.dequeue();
     Assertions.assertEquals("u1", first.user());
     Assertions.assertEquals("u1@brown.edu", first.contact());
-    Assertions.assertEquals(Duration.parse("PT30M"), first.printTime());
+    Assertions.assertEquals("PT30M", first.printTime());
 
     Assertions.assertEquals("u2", second.user());
     Assertions.assertEquals("u2@brown.edu", second.contact());
-    Assertions.assertEquals(Duration.parse("PT30M"), second.printTime());
+    Assertions.assertEquals("PT30M", second.printTime());
 
     Assertions.assertEquals("u3", third.user());
     Assertions.assertEquals("u3@brown.edu", third.contact());
-    Assertions.assertEquals(Duration.parse("PT30M"), third.printTime());
+    Assertions.assertEquals("PT30M", third.printTime());
 
-    //todo: test time
+    // todo: test time
   }
+
   @Test
-  public void dequeueTest(){
+  public void dequeueTest() {
     QHandler handler = QHandler.fullyReserved();
     Map<String, String> req1 = new HashMap<>();
     Map<String, String> req2 = new HashMap<>();
@@ -94,10 +88,10 @@ public class QueueTest {
 
     Assertions.assertEquals("u1", first.user());
     Assertions.assertEquals("u1@brown.edu", first.contact());
-    Assertions.assertEquals(Duration.parse("PT30M"), first.printTime());
+    Assertions.assertEquals("PT30M", first.printTime());
 
     Assertions.assertEquals("u3", second.user());
     Assertions.assertEquals("u3@brown.edu", second.contact());
-    Assertions.assertEquals(Duration.parse("PT30M"), second.printTime());
+    Assertions.assertEquals("PT30M", second.printTime());
   }
 }

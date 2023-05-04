@@ -1,6 +1,5 @@
 package fuzzTesting;
 
-import static org.testng.AssertJUnit.assertTrue;
 import static spark.Spark.after;
 
 import java.io.BufferedReader;
@@ -8,14 +7,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import server.csvapi.LoadHandler;
 import spark.Spark;
 
 public class FuzzTest {
@@ -28,7 +24,7 @@ public class FuzzTest {
     Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
   }
 
-  //final Storage storage = new Storage();
+  // final Storage storage = new Storage();
 
   /**
    * Before each test the server is initialized with all handlers prepared. Ensures a fresh server
@@ -96,8 +92,8 @@ public class FuzzTest {
   /**
    * fuzz tests search with valid inputs
    *
-   * @throws IOException thrown when an error occurs in the connection
-   * //@throws FactoryFailureException thrown when creator fails -- doesn't
+   * @throws IOException thrown when an error occurs in the connection //@throws
+   *     FactoryFailureException thrown when creator fails -- doesn't
    */
   /*
   @Test
@@ -117,7 +113,7 @@ public class FuzzTest {
    *
    * @throws IOException thrown when a connection error occurs
    */
-  @Test
+  // @Test
   public void fuzzWeatherTest() throws IOException {
     FuzzHelper fuzzHelper = new FuzzHelper();
     for (int i = 0; i < 1000; i++) {

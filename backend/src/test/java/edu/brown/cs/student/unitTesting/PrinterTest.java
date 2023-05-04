@@ -5,20 +5,18 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import queueclasses.Job;
 import queueclasses.Printer;
 import queueclasses.QHandler;
 import queueclasses.Status;
-import server.JobQueue;
 
 public class PrinterTest {
-  //todo: test time
+  // todo: test time
   @Test
-  public void setStateTest(){
+  public void setStateTest() {
     QHandler handler = new QHandler();
-    Map<String, String> req1 = new HashMap<>(); //both filament and status changed
-    Map<String, String> req2 = new HashMap<>(); //just filament
-    Map<String, String> req3 = new HashMap<>(); //just status
+    Map<String, String> req1 = new HashMap<>(); // both filament and status changed
+    Map<String, String> req2 = new HashMap<>(); // just filament
+    Map<String, String> req3 = new HashMap<>(); // just status
     req1.put("command", "update");
     req1.put("printer_name", "p1");
     req1.put("filament", "purple");
@@ -60,7 +58,8 @@ public class PrinterTest {
     req.put("command", "update");
     req.put("filament", "orange");
     String result = handler.update(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"No printer name was provided!\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"No printer name was provided!\"}", result);
   }
 
   // invalid name - non existent printer
@@ -72,7 +71,8 @@ public class PrinterTest {
     req.put("printer_name", "p9"); // a non-existent printer
     req.put("status", "reserved");
     String result = handler.update(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"Printer name is invalid.\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"Printer name is invalid.\"}", result);
   }
 
   // error handling on invalid statuses
@@ -84,7 +84,8 @@ public class PrinterTest {
     req.put("printer_name", "p4");
     req.put("status", "invalid");
     String result = handler.update(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"Status provided is invalid.\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"Status provided is invalid.\"}", result);
   }
 
   // error handling - no filament or status update provided
@@ -95,7 +96,9 @@ public class PrinterTest {
     req.put("command", "update");
     req.put("printer_name", "p1");
     String result = handler.update(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"No filament or status update was provided!\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"No filament or status update was provided!\"}",
+        result);
   }
 
   // changing only filament
@@ -134,12 +137,15 @@ public class PrinterTest {
     req.put("command", "enqueue");
     req.put("user", "Alice");
     req.put("contact", "alice@example.com");
-    req.put("duration", "PT2H30M"); // unsure of what formatting for print_time will look like just yet
+    req.put(
+        "duration", "PT2H30M"); // unsure of what formatting for print_time will look like just yet
     String result = handler.enqueue(new RequestStub(req));
     Map<String, String> req2 = new HashMap<>();
     req2.put("printerName", "p1");
     result = handler.rejectPrinter(new RequestStub(req2));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"printer p1 is not busy or reserved\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"printer p1 is not busy or reserved\"}",
+        result);
     Printer p1 = handler.printers.get("p1");
     Assertions.assertEquals(Status.AVAILABLE, p1.getStatus());
     Assertions.assertEquals("Unloaded", p1.filament);
@@ -158,7 +164,9 @@ public class PrinterTest {
     Map<String, String> req2 = new HashMap<>();
     req2.put("printerName", "nonexistent");
     String result = handler.rejectPrinter(new RequestStub(req2));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"printer nonexistent does not exist\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"printer nonexistent does not exist\"}",
+        result);
   }
 
   @Test
@@ -174,7 +182,9 @@ public class PrinterTest {
     Map<String, String> req2 = new HashMap<>();
     req2.put("printerName", "p1");
     String result = handler.rejectPrinter(new RequestStub(req2));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"printer p1 is not busy or reserved\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"printer p1 is not busy or reserved\"}",
+        result);
   }
 
   @Test
@@ -224,7 +234,8 @@ public class PrinterTest {
     Map<String, String> req = new HashMap<>();
     req.put("command", "claim");
     String result = handler.claim(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"No printer provided\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"No printer provided\"}", result);
   }
 
   @Test
@@ -234,7 +245,8 @@ public class PrinterTest {
     req.put("command", "claim");
     req.put("printerName", "p9");
     String result = handler.claim(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"printer p9 does not exist\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"printer p9 does not exist\"}", result);
   }
 
   @Test
@@ -244,7 +256,8 @@ public class PrinterTest {
     req.put("command", "claim");
     req.put("printerName", "p2");
     String result = handler.claim(new RequestStub(req));
-    Assertions.assertEquals("{\"result\":\"error_bad_request\",\"message\":\"printer p2 does not have a job pending\"}", result);
+    Assertions.assertEquals(
+        "{\"result\":\"error_bad_request\",\"message\":\"printer p2 does not have a job pending\"}",
+        result);
   }
-
 }

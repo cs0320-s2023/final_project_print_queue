@@ -1,10 +1,8 @@
 package queueclasses;
 
-import java.time.LocalTime;
-import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
-public class Printer{
+public class Printer {
   private String name;
   public String filament;
   private Status status;
@@ -12,13 +10,12 @@ public class Printer{
   private @Nullable Job currentJob;
 
   /**
-   *
    * @param name The name of the printer. Should match the names used by the bdw
    * @param filament description of the currently loaded status
    * @param status the state of the printer. options described more fully in hte Status enum
    * @param timeStarted when the printer last changed state
    */
-  public Printer(String name, String filament, Status status, String timeStarted){
+  public Printer(String name, String filament, Status status, String timeStarted) {
     this.name = name;
     this.filament = filament;
     this.status = status;
@@ -28,6 +25,7 @@ public class Printer{
 
   /**
    * setter for the filament parameter
+   *
    * @param filament the new filament description
    */
   public void setFilament(String filament) {
@@ -36,6 +34,7 @@ public class Printer{
 
   /**
    * setter for the status parameter
+   *
    * @param status the string form of the new status
    */
   public boolean setStatus(String status) {
@@ -52,6 +51,7 @@ public class Printer{
   }
   /**
    * setter for the currentJob parameter
+   *
    * @param currentJob the new Optional<job>
    */
   public void setCurrentJob(Job currentJob) {
@@ -59,19 +59,19 @@ public class Printer{
   }
   /**
    * setter for the timeStarted parameter
+   *
    * @param time the new time
    */
-  public void setTimeStarted(String time){
+  public void setTimeStarted(String time) {
     this.timeStarted = time;
   }
 
   /**
    * getter for the status parameter
+   *
    * @return the current status
    */
   public Status getStatus() {
     return this.status;
   }
-
 }
-

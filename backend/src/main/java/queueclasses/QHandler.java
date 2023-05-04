@@ -3,43 +3,47 @@ package queueclasses;
 import static queueclasses.Status.AVAILABLE;
 import static queueclasses.Status.PENDING;
 
-
-import java.io.IOException;
-import com.squareup.moshi.Moshi;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import server.APIUtilities;
 import server.JobQueue;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import java.time.Duration;
 
 public class QHandler implements Route {
   public JobQueue printQ;
   public HashMap<String, Printer> printers;
-  public QHandler(){
+
+  public QHandler() {
     this.printQ = new JobQueue();
     this.printers = new HashMap<>();
     // put real name later
-    this.printers.put("p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p2", new Printer("p2", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p3", new Printer("p3", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p4", new Printer("p4", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p5", new Printer("p5", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
-    this.printers.put("p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p1", new Printer("p1", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p2", new Printer("p2", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p3", new Printer("p3", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p4", new Printer("p4", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p5", new Printer("p5", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p6", new Printer("p6", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p7", new Printer("p7", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
+    this.printers.put(
+        "p8", new Printer("p8", "Unloaded", Status.AVAILABLE, LocalTime.now().toString()));
   }
   /**
    * Used for testing
+   *
    * @return a QHandler with all printers reserved
    */
-  static public QHandler fullyReserved(){
+  public static QHandler fullyReserved() {
     QHandler toReturn = new QHandler();
     toReturn.printers.values().stream().forEach(printer -> printer.setStatus("reserved"));
     return toReturn;
@@ -47,6 +51,7 @@ public class QHandler implements Route {
 
   /**
    * passes an api request along to the handleRequest function
+   *
    * @param request
    * @param response
    * @return the serialized result to return to the client
@@ -58,6 +63,7 @@ public class QHandler implements Route {
 
   /**
    * Identifies the command being invoked, and passes it along to the appropriate handler
+   *
    * @param request
    * @return the serialized result to return to the client
    */
@@ -72,48 +78,50 @@ public class QHandler implements Route {
       map.put("message", "No command provided.");
       return APIUtilities.toJson(map); // serialize to JSON for output
     }
-  // TODO: reject from printer method later
-    String ret = switch (command) {
-      case "enqueue" -> this.enqueue(request);
-      case "rejectQueue" -> this.rejectFromQueue(request);
-      case "update" -> this.update(request);
-      case "rejectPrinter" -> this.rejectPrinter(request);
-      case "claim" -> this.claim(request);
-      case "getState" -> this.getState(request);
-      default -> {
-        map.put("result", "error_bad_request");
-        map.put("message", "No command provided.");
-        yield APIUtilities.toJson(map);
-      }
-    };
+    // TODO: reject from printer method later
+    String ret =
+        switch (command) {
+          case "enqueue" -> this.enqueue(request);
+          case "rejectQueue" -> this.rejectFromQueue(request);
+          case "update" -> this.update(request);
+          case "rejectPrinter" -> this.rejectPrinter(request);
+          case "claim" -> this.claim(request);
+          case "getState" -> this.getState(request);
+          default -> {
+            map.put("result", "error_bad_request");
+            map.put("message", "No command provided.");
+            yield APIUtilities.toJson(map);
+          }
+        };
     this.assignPrinters();
     return ret;
   }
 
   /**
-   *
    * @param request the original API request object. not used here
    * @return the serialization of printQ and printers
    */
-  private String getState(Request request){
+  private String getState(Request request) {
     Map<String, Object> toSerialize = new HashMap<>();
     System.out.println("a");
     toSerialize.put("printQ", printQ.getQueue());
     toSerialize.put("printers", printers.values());
     toSerialize.put("result", "success");
-    //toSerialize.put("test job", new Job("alice", "a@gmail.com",
-      //  Duration.of(5, ChronoUnit.MINUTES), LocalTime.now()));
+    // toSerialize.put("test job", new Job("alice", "a@gmail.com",
+    //  Duration.of(5, ChronoUnit.MINUTES), LocalTime.now()));
     System.out.println("b");
     try {
-      //return new Moshi.Builder().build().adapter(Duration.class).toJson(Duration.of(5, ChronoUnit.MINUTES));
+      // return new Moshi.Builder().build().adapter(Duration.class).toJson(Duration.of(5,
+      // ChronoUnit.MINUTES));
       return APIUtilities.toJson(toSerialize);
-    } catch (Exception e){
+    } catch (Exception e) {
       return e.getMessage();
     }
   }
 
   /**
-   *  Adds a job to the queue
+   * Adds a job to the queue
+   *
    * @param request should contain user, contact, and duration parameters
    * @return A success or failure message
    */
@@ -136,11 +144,12 @@ public class QHandler implements Route {
 
   /**
    * Kicks user from queue if not already assigned to printer.
+   *
    * @param request The original API request object. Should hold a user and contact param
    * @return success or failure message
    */
   public String rejectFromQueue(Request request) {
-    //todo: contact should be unique, in an enforced way
+    // todo: contact should be unique, in an enforced way
     String user = request.queryParams("user");
     String contact = request.queryParams("contact");
     Map<String, Object> map = new HashMap<>();
@@ -163,8 +172,9 @@ public class QHandler implements Route {
   }
 
   /**
-   *  Updates printer status. Makes changes to printer object's instance variables.
-   *  Does not remove users from printer - use forfeit.
+   * Updates printer status. Makes changes to printer object's instance variables. Does not remove
+   * users from printer - use forfeit.
+   *
    * @param request should contain printer_name, filament, and status params
    * @return a success or failure message
    */
@@ -194,7 +204,7 @@ public class QHandler implements Route {
     }
     // now, assuming we have a valid printer, filament and/or status to update
 
-    //updates the start time
+    // updates the start time
     printerToUpdate.setTimeStarted(LocalTime.now().toString());
     if (filament != null) {
       printerToUpdate.setFilament(filament);
@@ -212,6 +222,7 @@ public class QHandler implements Route {
 
   /**
    * removes any current job from the specified printer, and makes the printer available
+   *
    * @param request Should hold a printerName param
    * @return a success or failure message
    */
@@ -225,7 +236,7 @@ public class QHandler implements Route {
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
     Printer printer = this.printers.get(printerName);
-    if (printer == null){
+    if (printer == null) {
       message.put("result", "error_bad_request");
       message.put("message", "printer " + printerName + " does not exist");
       return APIUtilities.toJson(message); // serialize to JSON for output
@@ -248,6 +259,7 @@ public class QHandler implements Route {
 
   /**
    * Changes a printer with a pending job to busy status
+   *
    * @param request should contain a printerName parameter
    * @return a success or failure message
    */
@@ -261,18 +273,18 @@ public class QHandler implements Route {
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
     Printer printer = this.printers.get(printerName);
-    if (printer == null){
+    if (printer == null) {
       message.put("result", "error_bad_request");
       message.put("message", "printer " + printerName + " does not exist");
       return APIUtilities.toJson(message); // serialize to JSON for output
     }
-    if (printer.getStatus() == PENDING){
+    if (printer.getStatus() == PENDING) {
       printer.setStatus("busy");
       printer.setTimeStarted(LocalTime.now().toString());
       message.put("result", "success");
       message.put("message", "printer " + printerName + " claimed");
       return APIUtilities.toJson(message); // serialize to JSON for output
-    }else {
+    } else {
       message.put("result", "error_bad_request");
       message.put("message", "printer " + printerName + " does not have a job pending");
     }

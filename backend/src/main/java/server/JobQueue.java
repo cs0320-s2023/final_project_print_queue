@@ -10,6 +10,7 @@ public class JobQueue {
   public Queue<Job> getQueue() {
     return this.queue;
   }
+
   public void enqueue(Job job) {
     this.queue.offer(job);
   }

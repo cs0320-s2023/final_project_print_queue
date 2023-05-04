@@ -1,47 +1,55 @@
-export interface QueueCard {
-  name: string;
-  time: string;
-  printer: string;
-  started: boolean;
-  status: string;
-  id: string;
-}
+import { Job } from "../utils/types";
 
-const QueueItems: QueueCard[] = [];
-
-// const QueueItems: QueueCard[] = [
-//   {
-//     name: "Ivan Pineda-Dominguez",
-//     time: "01:23:00",
-//     printer: "Printer 1",
-//     started: true,
-//     status: "Printing",
-//     id: "1",
-//   },
-//   {
-//     name: "Milo Kron",
-//     time: "01:12:00",
-//     printer: "Printer 2",
-//     started: true,
-//     status: "Printing",
-//     id: "2",
-//   },
-//   {
-//     name: "Patrick Otriz",
-//     time: "00:10:00",
-//     printer: "Printer 3",
-//     started: false,
-//     status: "Pending",
-//     id: "3",
-//   },
-//   {
-//     name: "Mebele Onwuaduegbo",
-//     time: "00:00:00",
-//     printer: "",
-//     started: false,
-//     status: "In Queue",
-//     id: "4",
-//   },
-// ];
+const QueueItems: Job[] = [
+  {
+    user: "Ivan Pineda-Dominguez",
+    contact: "505-918-3333",
+    printTime: "01:23:00",
+    timeQueued: "01:23:00",
+    // status: "Printing",
+    uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
+    JobID: "1",
+    // printer: "Printer 1",
+    // started: true,
+  },
+  {
+    user: "Milo Kron",
+    contact: "505-918-3334",
+    printTime: "01:23:00",
+    timeQueued: "01:23:00",
+    // status: "Printing",
+    uid: "2",
+    JobID: "2",
+  },
+  {
+    user: "Patrick Otriz",
+    contact: "505-918-3335",
+    printTime: "01:23:00",
+    timeQueued: "01:23:00",
+    // status: "Printing",
+    uid: "3",
+    JobID: "3",
+  },
+  {
+    user: "Mebele Onwuaduegbo",
+    contact: "505-918-3336",
+    printTime: "01:23:00",
+    timeQueued: "01:23:00",
+    // status: "Printing",
+    uid: "4",
+    JobID: "4",
+  },
+  {
+    user: "Ivan Pineda-Dominguez",
+    contact: "505-918-3337",
+    printTime: "01:23:00",
+    timeQueued: "01:23:00",
+    // status: "Printing",
+    uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
+    JobID: "5",
+    // printer: "Printer 1",
+    // started: true,
+  },
+];
 
 export default QueueItems;

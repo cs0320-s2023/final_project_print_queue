@@ -1,5 +1,6 @@
 package fuzzTesting;
 
+import static org.testng.AssertJUnit.assertTrue;
 import static spark.Spark.after;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import queueclasses.QHandler;
 import spark.Spark;
 
 public class FuzzTest {
@@ -39,22 +41,15 @@ public class FuzzTest {
           response.header("Access-Control-Allow-Methods", "*");
           response.header("Content-Type", "application/json");
         });
-    /*
-    Spark.get("loadcsv", new LoadHandler(this.storage));
-    Spark.get("viewcsv", new ViewHandler(this.storage));
-    Spark.get("searchcsv", new SearchHandler(this.storage));
-    Spark.get("weather", new WeatherHandler(3, TimeUnit.SECONDS, 1.0));
+    Spark.get("qHandle", new QHandler());
     Spark.init();
-    Spark.awaitInitialization();*/
+    Spark.awaitInitialization();
   }
 
   /** After each test, gracefully stop the Spark server. */
   @AfterEach
   public void teardown() {
-    Spark.unmap("/loadcsv");
-    Spark.unmap("/viewcsv");
-    Spark.unmap("/searchcsv");
-    Spark.unmap("/weather");
+    Spark.unmap("/qHandle");
     Spark.awaitStop();
   }
 
@@ -96,48 +91,20 @@ public class FuzzTest {
    * @throws IOException thrown when an error occurs in the connection //@throws
    *     FactoryFailureException thrown when creator fails -- doesn't
    */
-  /*
   @Test
-  public void fuzzSearchTest() throws IOException, FactoryFailureException {
-    HttpURLConnection request =
-        tryRequest("loadcsv?filepath=data%2Fstars%2Fstardata.csv&header=True");
-    FuzzHelper fuzzHelper = new FuzzHelper();
-    for (int i = 0; i < 500; i++) {
-      String apiCall = fuzzHelper.randomStarSearch(this.storage);
-      request = tryRequest(apiCall);
-      assertTrue(request.getResponseCode() != -1);
-    }
-  }
-
-  /**
-   * fuzz tests valid weather coords
-   *
-   * @throws IOException thrown when a connection error occurs
-   */
-  // @Test
-  public void fuzzWeatherTest() throws IOException {
+  public void fuzzTestQHandle() throws IOException {
     FuzzHelper fuzzHelper = new FuzzHelper();
     for (int i = 0; i < 1000; i++) {
-      // Double lat = fuzzHelper.randomCoordSearch(20.0, 50.0);
-      // Double lon = fuzzHelper.randomCoordSearch(-130.0, -160.0);
-      // HttpURLConnection request = tryRequest("weather?lat=" + lat + "&lon=" + lon);
-      // assertTrue(request.getResponseCode() != -1);
-    }
-  }
-
-  /**
-   * Checks for unhandled errors
-   *
-   * @throws IOException
-   */
-  @Test
-  public void fuzzTestFor500s() throws IOException {
-    FuzzHelper fuzzHelper = new FuzzHelper();
-    for (int i = 0; i < 1000; i++) {
-      // todo: make this actually work
-      // String request = fuzzHelper.makeRandomAPICall();
-      // HttpURLConnection request = tryRequest(fuzzHelper.makeRandomAPICall());
-      // assertTrue(request.getResponseCode() != 500);
+      String requestStr = fuzzHelper.makeRandomAPICall();
+      HttpURLConnection request = tryRequest(requestStr);
+      if (request.getResponseCode() != 200) {
+        System.out.println(
+            "The input " + requestStr + " produced the error code" + request.getResponseCode());
+        assertTrue(false);
+      }
+      //System.out.println(requestStr);
+      //System.out.println(request.getResponseCode());
+      assertTrue(true);
     }
   }
 }

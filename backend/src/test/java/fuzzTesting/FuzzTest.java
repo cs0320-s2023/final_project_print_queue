@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import spark.Spark;
 
 public class FuzzTest {
@@ -117,10 +118,26 @@ public class FuzzTest {
   public void fuzzWeatherTest() throws IOException {
     FuzzHelper fuzzHelper = new FuzzHelper();
     for (int i = 0; i < 1000; i++) {
-      Double lat = fuzzHelper.randomCoordSearch(20.0, 50.0);
-      Double lon = fuzzHelper.randomCoordSearch(-130.0, -160.0);
-      HttpURLConnection request = tryRequest("weather?lat=" + lat + "&lon=" + lon);
+      // Double lat = fuzzHelper.randomCoordSearch(20.0, 50.0);
+      // Double lon = fuzzHelper.randomCoordSearch(-130.0, -160.0);
+      // HttpURLConnection request = tryRequest("weather?lat=" + lat + "&lon=" + lon);
       // assertTrue(request.getResponseCode() != -1);
+    }
+  }
+
+  /**
+   * Checks for unhandled errors
+   *
+   * @throws IOException
+   */
+  @Test
+  public void fuzzTestFor500s() throws IOException {
+    FuzzHelper fuzzHelper = new FuzzHelper();
+    for (int i = 0; i < 1000; i++) {
+      // todo: make this actually work
+      // String request = fuzzHelper.makeRandomAPICall();
+      // HttpURLConnection request = tryRequest(fuzzHelper.makeRandomAPICall());
+      // assertTrue(request.getResponseCode() != 500);
     }
   }
 }

@@ -89,7 +89,7 @@ public class QHandler implements Route {
           case "getState" -> this.getState(request);
           default -> {
             map.put("result", "error_bad_request");
-            map.put("message", "No command provided.");
+            map.put("message", "No valid command provided.");
             yield APIUtilities.toJson(map);
           }
         };

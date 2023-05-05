@@ -2,7 +2,6 @@ package queueclasses;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import queueclasses.Job;
 
 public class JobQueue {
   private final Queue<Job> queue = new LinkedList<>();

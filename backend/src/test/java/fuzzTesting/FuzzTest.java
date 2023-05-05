@@ -102,8 +102,8 @@ public class FuzzTest {
             "The input " + requestStr + " produced the error code" + request.getResponseCode());
         assertTrue(false);
       }
-      //System.out.println(requestStr);
-      //System.out.println(request.getResponseCode());
+      // System.out.println(requestStr);
+      // System.out.println(request.getResponseCode());
       assertTrue(true);
     }
   }

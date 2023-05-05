@@ -91,7 +91,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>edu.brown.cs.student.main.Main</mainClass>
+              <mainClass>edu.server.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

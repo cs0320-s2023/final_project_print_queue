@@ -6,10 +6,9 @@ import queueclasses.QHandler;
 import spark.Spark;
 
 /**
- * Server class that begins the API. Running main() will begin the server on localhost with port
- * 3232.
+ * Main class that begins the API. Running main() will begin the server on localhost with port 3232.
  */
-public class Server {
+public class Main {
 
   /**
    * Main method that starts the server.
@@ -26,6 +25,6 @@ public class Server {
     Spark.get("qHandle", new QHandler());
     Spark.init();
     Spark.awaitInitialization();
-    System.out.println("Server started.");
+    System.out.println("Main started.");
   }
 }

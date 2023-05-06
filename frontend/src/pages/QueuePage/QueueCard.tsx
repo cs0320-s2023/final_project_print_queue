@@ -1,4 +1,10 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Avatar,
   Box,
   Button,
@@ -8,17 +14,13 @@ import {
   Divider,
   HStack,
   Heading,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Stack,
   StackDivider,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Countdown, { zeroPad } from "react-countdown";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { useAuthorization } from "../../utils/hooks/useAuthorization";
 import { AuthRoles } from "../../utils/Permissions/determineUserPermissions";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -36,6 +38,7 @@ import {
   isRejectPrinterServerResponse,
   isServerErrorResponse,
 } from "../../utils/types";
+import React from "react";
 
 interface TimerProps {
   hours: number;
@@ -52,9 +55,12 @@ interface QueueCardProps {
 }
 
 function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
-  const currentDate = Date.now();
-  const [user, loading] = useAuthState(auth);
+  const moment = require("moment");
+
+  const [user] = useAuthState(auth);
   const { authorizationRole } = useAuthorization();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef(null);
 
   const handleDelete = async () => {
     let url = "http://localhost:3232/qHandle?";
@@ -113,32 +119,6 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
     }
   };
 
-  const renderMenuOption = () => {
-    // TODO: Return if user id matches.
-    if (authorizationRole === AuthRoles.admin || user?.email === job.contact)
-      return (
-        <Menu>
-          <MenuButton as={Button} size="sm">
-            <BsThreeDotsVertical />
-          </MenuButton>
-          <MenuList>
-            <MenuItem>
-              <HStack>
-                <EditIcon />
-                <Text>Edit</Text>
-              </HStack>
-            </MenuItem>
-            <MenuItem onClick={handleDelete}>
-              <HStack color="red">
-                <DeleteIcon />
-                <Text>Delete</Text>
-              </HStack>
-            </MenuItem>
-          </MenuList>
-        </Menu>
-      );
-  };
-
   const renderer = ({ hours, minutes, seconds, completed }: TimerProps) => {
     if (completed) {
       // Render a completed state
@@ -154,20 +134,32 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
   };
 
   const renderCardFooter = () => {
-    if (printer) {
+    if (printer && printer.currentJob?.printTime) {
+      const momentObject = moment(printer.timeStarted, "HH:mm:ss");
+
+      // console.log(momentObject);
+      // console.log("5 More min");
+      // console.log(newMomentObject);
+
       switch (printer.status) {
         case Status.BUSY:
+          console.log(printer.currentJob.printTime);
+          let busyEndtime = momentObject
+            .add(printer.currentJob.printTime, "seconds")
+            .utc()
+            .format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
                 Job in Progress...
               </Text>
               <Box w="100px">
-                <Countdown date={currentDate + 1000000} renderer={renderer} />
+                <Countdown date={busyEndtime} renderer={renderer} />
               </Box>
             </HStack>
           );
         case Status.PENDING:
+          let pendingEndtime = momentObject.add(5, "minutes").utc().format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
@@ -181,7 +173,7 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
                 >
                   Confirm Print Has Started
                 </Button>
-                <Countdown date={currentDate + 30000} renderer={renderer} />,
+                <Countdown date={pendingEndtime} renderer={renderer} />,
               </HStack>
             </HStack>
           );
@@ -211,11 +203,58 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
             )}
             <Heading size="md">{job.user}</Heading>
           </HStack>
-          {renderMenuOption()}
+          {authorizationRole === AuthRoles.admin ||
+          user?.email === job.contact ? (
+            <Button
+              colorScheme="red"
+              variant="ghost"
+              leftIcon={<DeleteIcon />}
+              onClick={onOpen}
+            >
+              Delete
+            </Button>
+          ) : (
+            ""
+          )}
         </HStack>
       </CardHeader>
       <Divider color={"blackAlpha.400"} />
-      <CardBody>{renderCardFooter()}</CardBody>
+      <CardBody>
+        {renderCardFooter()}
+        <AlertDialog
+          isOpen={isOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Delete Job
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                Are you sure? You can't undo this action afterwards.
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="red"
+                  onClick={() => {
+                    handleDelete();
+                    onClose();
+                  }}
+                  ml={3}
+                >
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+      </CardBody>
     </Card>
   );
 }

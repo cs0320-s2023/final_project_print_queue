@@ -47,10 +47,11 @@ interface TimerProps {
 interface QueueCardProps {
   job: Job;
   printer?: Printer;
+  img: string;
   setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function QueueCard({ job, printer, setUpdate }: QueueCardProps) {
+function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
   const currentDate = Date.now();
   const [user, loading] = useAuthState(auth);
   const { authorizationRole } = useAuthorization();
@@ -203,12 +204,11 @@ function QueueCard({ job, printer, setUpdate }: QueueCardProps) {
       <CardHeader>
         <HStack justifyContent="space-between">
           <HStack spacing={4}>
-            {user?.displayName && user.photoURL ? (
-              <Avatar size="md" name={user.displayName} src={user.photoURL} />
+            {user?.displayName ? (
+              <Avatar size="md" name={user.displayName} src={img} />
             ) : (
-              <Avatar size="md" name="" src="" />
+              <Avatar size="md" name="" src={img} />
             )}
-
             <Heading size="md">{job.user}</Heading>
           </HStack>
           {renderMenuOption()}

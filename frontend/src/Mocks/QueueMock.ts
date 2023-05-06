@@ -9,6 +9,8 @@ const QueueItems: Job[] = [
     // status: "Printing",
     uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
     JobID: "1",
+    imgUrl:
+      "https://lh3.googleusercontent.com/a/AGNmyxZLO4r8piR6RPXsRbR-SUji10-E7qyQVlULBAd1=s96-c",
     // printer: "Printer 1",
     // started: true,
   },
@@ -20,6 +22,8 @@ const QueueItems: Job[] = [
     // status: "Printing",
     uid: "2",
     JobID: "2",
+    imgUrl:
+      "https://lh3.googleusercontent.com/a/AGNmyxZLO4r8piR6RPXsRbR-SUji10-E7qyQVlULBAd1=s96-c",
   },
   {
     user: "Patrick Otriz",
@@ -29,6 +33,8 @@ const QueueItems: Job[] = [
     // status: "Printing",
     uid: "3",
     JobID: "3",
+    imgUrl:
+      "https://lh3.googleusercontent.com/a/AGNmyxZLO4r8piR6RPXsRbR-SUji10-E7qyQVlULBAd1=s96-c",
   },
   {
     user: "Mebele Onwuaduegbo",
@@ -38,6 +44,8 @@ const QueueItems: Job[] = [
     // status: "Printing",
     uid: "4",
     JobID: "4",
+    imgUrl:
+      "https://lh3.googleusercontent.com/a/AGNmyxZLO4r8piR6RPXsRbR-SUji10-E7qyQVlULBAd1=s96-c",
   },
   {
     user: "Ivan Pineda-Dominguez",
@@ -47,6 +55,8 @@ const QueueItems: Job[] = [
     // status: "Printing",
     uid: "MINoWrrZcVf25hw0cyuNmYbWBs72",
     JobID: "5",
+    imgUrl:
+      "https://lh3.googleusercontent.com/a/AGNmyxZLO4r8piR6RPXsRbR-SUji10-E7qyQVlULBAd1=s96-c",
     // printer: "Printer 1",
     // started: true,
   },

@@ -6,6 +6,7 @@ export interface Job {
   timeQueued: string;
   // status: string;
   JobID: string; // This feild hasn't yet been added
+  imgUrl: string;
   // printer:
 }
 

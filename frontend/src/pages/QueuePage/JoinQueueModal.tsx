@@ -40,11 +40,7 @@ interface QueueModalProps {
 
 const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
 
-function JoinQueueModal({
-  onClose,
-  isOpen,
-  setUpdate,
-}: QueueModalProps) {
+function JoinQueueModal({ onClose, isOpen, setUpdate }: QueueModalProps) {
   const [user] = useAuthState(auth);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [printTime, setPrintTime] = useState<string>("");
@@ -53,7 +49,7 @@ function JoinQueueModal({
   const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
     const url =
       baseurl +
-      `user=${user?.displayName}&contact=${user?.email}&duration=${printTime}`;
+      `user=${user?.displayName}&contact=${user?.email}&imgUrl=${user?.photoURL}&duration=${printTime}`;
 
     const enqueueResponse = await enqueue(url);
     if (enqueueResponse !== undefined) {

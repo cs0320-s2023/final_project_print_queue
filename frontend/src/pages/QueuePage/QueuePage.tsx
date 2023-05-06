@@ -192,6 +192,7 @@ function QueuePage() {
                             job={{ ...printer.currentJob }}
                             printer={printer}
                             setUpdate={setUpdate}
+                            img={printer.currentJob.imgUrl}
                           />
                         );
                       }
@@ -202,6 +203,7 @@ function QueuePage() {
                           key={job.JobID}
                           job={{ ...job }}
                           setUpdate={setUpdate}
+                          img={job.imgUrl}
                         />
                       );
                     })}

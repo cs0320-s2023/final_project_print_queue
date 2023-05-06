@@ -24,7 +24,7 @@ function AlertModal({ onClose, isOpen }: AlertModalProps) {
   const cancelRef = React.useRef(null);
 
   const defaultOptions = {
-    loop: true,
+    loop: false,
     autoplay: true,
     animationData: signup,
     rendererSettings: {

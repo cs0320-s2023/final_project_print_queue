@@ -214,11 +214,6 @@ function QueuePage() {
         <JoinQueueModal
           onClose={onCloseJoinQueueModal}
           isOpen={isOpenJoinQueueModal}
-          username={
-            user?.displayName === null || user?.displayName === undefined
-              ? "anonymous"
-              : user.displayName
-          }
           setUpdate={setUpdate}
         />
         <AlertModal onClose={onCloseAlertModal} isOpen={isOpenAlertModal} />

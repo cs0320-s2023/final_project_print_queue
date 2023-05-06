@@ -3,6 +3,7 @@ package queueclasses;
 import static queueclasses.Status.AVAILABLE;
 import static queueclasses.Status.PENDING;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,8 @@ public class QHandler implements Route {
   public JobQueue printQ;
   public HashMap<String, Printer> printers;
 
+  //time a job is allowed to be pending for
+  public static Duration TIMEOUT = Duration.ofMinutes(5);
   public QHandler() {
     this.printQ = new JobQueue();
     this.printers = new HashMap<>();
@@ -285,6 +288,16 @@ public class QHandler implements Route {
   }
 
   public void assignPrinters() {
+    //clears overtime printers
+    for (Printer printer : this.printers.values()) {
+      if (printer.getStatus() == PENDING &&
+      printer.getTimeStarted().plus(TIMEOUT).isBefore(LocalTime.now())) {
+        printer.setStatus("available");
+        printer.setCurrentJob(null);
+        printer.setTimeStarted(LocalTime.now().toString());
+      }
+    }
+    //assigns empty printers
     for (Printer printer : this.printers.values()) {
       if (printer.getStatus() == AVAILABLE && !(this.printQ.getQueue().isEmpty())) {
         printer.setCurrentJob(this.printQ.dequeue());

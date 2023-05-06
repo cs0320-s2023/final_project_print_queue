@@ -1,5 +1,6 @@
 package fuzzTesting;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -9,10 +10,10 @@ public class FuzzHelper {
 
   /** generates and makes a random API call, asserting that the result is not a 500 error */
   private static List<String> possilbeCommands =
-      List.of("enqueue", "rejectQueue", "update", "rejectPrinter", "claim", "getState");
+      Arrays.asList("enqueue", "rejectQueue", "update", "rejectPrinter", "claim", "getState");
 
   private static List<String> possibleParams =
-      List.of(
+      Arrays.asList(
           "user",
           "contact",
           "duration",

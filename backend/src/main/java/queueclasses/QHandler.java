@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import server.APIUtilities;
-import server.JobQueue;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -103,16 +102,10 @@ public class QHandler implements Route {
    */
   private String getState(Request request) {
     Map<String, Object> toSerialize = new HashMap<>();
-    System.out.println("a");
     toSerialize.put("printQ", printQ.getQueue());
     toSerialize.put("printers", printers.values());
     toSerialize.put("result", "success");
-    // toSerialize.put("test job", new Job("alice", "a@gmail.com",
-    //  Duration.of(5, ChronoUnit.MINUTES), LocalTime.now()));
-    System.out.println("b");
     try {
-      // return new Moshi.Builder().build().adapter(Duration.class).toJson(Duration.of(5,
-      // ChronoUnit.MINUTES));
       return APIUtilities.toJson(toSerialize);
     } catch (Exception e) {
       return e.getMessage();

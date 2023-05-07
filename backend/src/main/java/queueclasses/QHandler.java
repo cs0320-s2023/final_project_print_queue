@@ -202,6 +202,8 @@ public class QHandler implements Route {
 
     // updates the start time
     printerToUpdate.setTimeStarted(LocalTime.now().toString());
+    // removes the current job
+    printerToUpdate.setCurrentJob(null);
     if (filament != null) {
       printerToUpdate.setFilament(filament);
     }

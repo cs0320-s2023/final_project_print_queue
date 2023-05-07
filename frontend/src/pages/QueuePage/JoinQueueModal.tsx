@@ -17,6 +17,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  VStack,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -38,7 +39,8 @@ interface QueueModalProps {
   setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
+const baseurl =
+  "https://bdw-printer-queue.onrender.com/qHandle?command=enqueue&";
 
 function JoinQueueModal({ onClose, isOpen, setUpdate }: QueueModalProps) {
   const [user] = useAuthState(auth);
@@ -83,10 +85,13 @@ function JoinQueueModal({ onClose, isOpen, setUpdate }: QueueModalProps) {
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
-            To join the queue please upload you .gcode file from the PrusaSlicer
-            in the area below. <DisclaimerBox />
-          </Text>
+          <VStack alignItems="start">
+            <DisclaimerBox />
+            <Text>
+              To join the queue please upload you .gcode file from the
+              PrusaSlicer in the area below.
+            </Text>
+          </VStack>
           <Container py={5}>
             <FileUpload
               setPrintTime={setPrintTime}

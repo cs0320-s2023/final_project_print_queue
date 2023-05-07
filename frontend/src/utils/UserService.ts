@@ -8,8 +8,7 @@ import {
   set,
   update,
 } from "firebase/database";
-import { IUserObject } from "../pages/AdminDash";
-import { AuthRoles } from "./Permissions/determineUserPermissions";
+import { IUserObject } from "../pages/AdminPage/AdminDash";
 
 export interface IUser {
   displayName: string | null;
@@ -48,13 +47,6 @@ class UserDataService {
     return userExists;
   };
 
-  // Following was an attempt to get return authrole from real-time database
-  // async getUserAuthorization(uid: string): Promise<string> {
-  //   const db = getDatabase();
-  //   const snapshot = await Promise.resolve(get(ref(db, "/users/" + uid)));
-  //   let user = snapshot.val();
-  //   return user.role;
-  // }
 
   update = (uid: string, updatedUser: IUser) => {
     console.log("IN UPDATE Function");
@@ -71,12 +63,6 @@ class UserDataService {
     uid: string,
     setAuthorization: React.Dispatch<React.SetStateAction<string>>
   ) => {
-    // onValue(ref(db, "users/" + uid), (snapshot) => {
-    //   const authRole = snapshot.val();
-    //   setAuthorization(authRole.role);
-    //   return authRole;
-    // });
-    // const dbReferance = ref(db, "users");
 
     let role = get(child(usersReference, uid))
       .then((snapshot) => {

@@ -39,6 +39,7 @@ import {
   isServerErrorResponse,
 } from "../../utils/types";
 import React from "react";
+import CountDownTimer from "../../components/CountDownTimer";
 
 interface TimerProps {
   hours: number;
@@ -63,11 +64,13 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
   const cancelRef = React.useRef(null);
 
   const handleDelete = async () => {
-    let url = "http://localhost:3232/qHandle?";
+    let url = "https://bdw-printer-queue.onrender.com/";
+
     if (printer) {
-      url += `command=rejectPrinter&printerName=${printer.name}`;
+      url += `qHandle?command=rejectPrinter&printerName=${printer.name}`;
+      console.log(url);
     } else {
-      url += `command=rejectQueue&user=${job.user}&contact=${job.contact}`;
+      url += `qHandle?command=rejectQueue&user=${job.user}&contact=${job.contact}`;
     }
 
     try {
@@ -80,12 +83,13 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
         isRejectFromQueueServerResponse(responseJson) ||
         isRejectPrinterServerResponse(responseJson)
       ) {
-        console.log(responseJson);
         setUpdate(true);
         return responseJson;
       } else if (isServerErrorResponse(responseJson)) {
+        console.log(responseJson);
         console.log("Got a server error");
       } else {
+        console.log(responseJson);
         console.log(
           "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
         );
@@ -97,7 +101,7 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
 
   const handleConfirmPrintStart = async () => {
     if (printer) {
-      let url = `http://localhost:3232/qHandle?command=claim&printerName=${printer.name}`;
+      let url = `https://bdw-printer-queue.onrender.com/qHandle?command=claim&printerName=${printer.name}`;
       try {
         const response = await fetch(url);
         const responseJson: ClaimPrinterServerResponse | ServerErrorResponse =
@@ -107,6 +111,7 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
           setUpdate(true);
           return responseJson;
         } else if (isServerErrorResponse(responseJson)) {
+          console.log(responseJson);
           console.log("Got a server error");
         } else {
           console.log(
@@ -119,61 +124,63 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
     }
   };
 
-  const renderer = ({ hours, minutes, seconds, completed }: TimerProps) => {
-    if (completed) {
-      // Render a completed state
-      return <Text>Completed</Text>;
-    } else {
-      // Render a countdown
-      return (
-        <span>
-          {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
-        </span>
-      );
-    }
-  };
+  // const renderer = ({ hours, minutes, seconds, completed }: TimerProps) => {
+  //   if (completed) {
+  //     // Render a completed state
+  //     return <Text>Completed</Text>;
+  //   } else {
+  //     // Render a countdown
+  //     return (
+  //       <span>
+  //         {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+  //       </span>
+  //     );
+  //   }
+  // };
 
   const renderCardFooter = () => {
     if (printer && printer.currentJob?.printTime) {
-      const momentObject = moment(printer.timeStarted, "HH:mm:ss");
-
-      // console.log(momentObject);
-      // console.log("5 More min");
-      // console.log(newMomentObject);
+      // const momentObject = moment(printer.timeStarted, "HH:mm:ss");
 
       switch (printer.status) {
         case Status.BUSY:
-          console.log(printer.currentJob.printTime);
-          let busyEndtime = momentObject
-            .add(printer.currentJob.printTime, "seconds")
-            .utc()
-            .format();
+          // let busyEndtime = momentObject
+          //   .add(printer.currentJob.printTime, "seconds")
+          //   .utc()
+          //   .format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
                 Job in Progress...
               </Text>
-              <Box w="100px">
+              {/* <Box w="100px">
                 <Countdown date={busyEndtime} renderer={renderer} />
+              </Box> */}
+              <Box>
+                <CountDownTimer printer={printer} />
               </Box>
             </HStack>
           );
         case Status.PENDING:
-          let pendingEndtime = momentObject.add(5, "minutes").utc().format();
+          // let pendingEndtime = momentObject.add(5, "minutes").utc().format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
                 Pending...
               </Text>
               <HStack spacing="5" justifyContent="space-evenly">
-                <Button
-                  colorScheme="orange"
-                  size="md"
-                  onClick={handleConfirmPrintStart}
-                >
-                  Confirm Print Has Started
-                </Button>
-                <Countdown date={pendingEndtime} renderer={renderer} />,
+                {(printer.currentJob.contact === user?.email ||
+                  authorizationRole === AuthRoles.admin) && (
+                  <Button
+                    colorScheme="orange"
+                    size="md"
+                    onClick={handleConfirmPrintStart}
+                  >
+                    Confirm Print Has Started
+                  </Button>
+                )}
+                <CountDownTimer printer={printer} />
+                {/* <Countdown date={pendingEndtime} renderer={renderer} />, */}
               </HStack>
             </HStack>
           );

@@ -48,7 +48,6 @@ function FileUpload({
     if (files.length > 0) {
       let file = files[0];
       let extension = file.name.split(".").pop();
-      console.log(extension);
       if (extension !== "gcode") {
         toast({
           title: `File Type Not Supported: Make sure your file ends in with .gcode`,

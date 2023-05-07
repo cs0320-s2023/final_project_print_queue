@@ -14,12 +14,6 @@ export const AuthorizationProvider: React.FC<AuthorizationProps> = ({
   const [user, loading] = useAuthState(auth);
   const [authorizationRole, setAuthorizationRole] = useState<string>("viewer");
 
-  // useEffect(() => {
-  //   setAuthorizationRole(
-  //     JSON.parse(window.localStorage.getItem("authorization"))
-  //   );
-  // }, [authorizationRole]);
-
   useEffect(() => {
     if (user) {
       UserService.syncUserAuthorizationRole(
@@ -29,12 +23,6 @@ export const AuthorizationProvider: React.FC<AuthorizationProps> = ({
         setAuthorizationRole(role);
         window.localStorage.setItem("authorization", role);
       });
-
-      // Following was an attempt to not pass setAuthroizationRole function
-      // let getAuthorizationRole = async () =>
-      //   await UserService.getUserAuthorization(user.uid);
-      // let role = getAuthorizationRole;
-      // setAuthorizationRole(role);
     }
   }, [user]);
 

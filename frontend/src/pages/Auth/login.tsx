@@ -24,7 +24,7 @@ function Login() {
   const [user] = useAuthState(auth);
   const { setAuthorizationRole } = useAuthorization();
 
-  // Navigation: Redirects user to dashboard if they are already logged in
+  // Navigation: Redirects user to profile page if they are already logged in
   const navigate = useNavigate();
   useEffect(() => {
     if (user) {
@@ -36,12 +36,11 @@ function Login() {
   const googleProvider = new GoogleAuthProvider();
   const GoogleLogin = async () => {
     try {
-      // TODO: Error handling when result isn't a valid user
       const result = await signInWithPopup(auth, googleProvider);
       const user: IUser = {
         displayName: result.user.displayName,
         email: result.user.email,
-        role: "user",
+        role: "user", // Authenticated users should have auth role of "user"
       };
 
       let userAlreadyExists = await UserService.exists(result.user.uid);
@@ -60,6 +59,7 @@ function Login() {
     }
   };
 
+  // Rendering options for Lottie image
   const defaultOptions = {
     loop: true,
     autoplay: true,

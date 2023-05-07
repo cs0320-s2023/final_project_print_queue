@@ -5,7 +5,7 @@ Developed by `mkron`, `ipinedad`, `conwuadu`, `Patback0`
 Github Repo: https://github.com/cs0320-s2023/final_project_print_queue
 
 ## Project Description
-TODO
+Project spec: https://docs.google.com/document/d/1KhQjlAZPWq2Juw_vbPNj1rrShd86_1cfsPRRaeLaHA8/edit?usp=sharing
 
 ## Design Choices
 TODO
@@ -24,17 +24,25 @@ TODO
   * `Frontend` TODO
            
 ## Tests
-TODO
+* `backend`
+    * `unitTesting` tests the various commands accessed through qHandle, both individually, and in set sequences to ensure that state works properly
+    * `fuzzTesting` generate random API calls roughly in the form expected by the backend and tests for non-200 result codes to ensure that all errors are handled properly by the API.
 
 
 ## API Endpoints
-* `qHandle` the only api endpoint. can be invoked with a variety of "command" parameters, producing different results
-    *TODO
+* `qHandle` the only api endpoint. can be invoked with a variety of "command" parameters, producing different results. Commands:
+    * `enqueue` Takes "user", "contact", "duration", and "imgUrl" paramaters,
+    produces a job, and adds it to the queue
+    * `rejectQueue` Takes "user" and "contact" parameters, and removes Jobs with the specified contact from the Queue
+    * `update` takes a "printer_name" and a "filament", "status", or both. updates the specified printer to the specified filament and/or status.
+    * `rejectPrinter` takes a "printerName" parameter, sets the specified printer to "availible", and remvoes the current job 
+    * `claim` takes a "printerName" parameter for a pending printer, and sets it to busy 
+    * `getState`sends back a full image of the print queue, and the state of each printer
 ## Errors and Bugs
 TODO
 
 ## Accessibility Considerations
-TODO
+TODO for frontend
 
 ## Running the Program
-TODO
+TODO for people who did deployment

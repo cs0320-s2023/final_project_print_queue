@@ -35,6 +35,8 @@ import {
   isGetStateServerResponse,
   isServerErrorResponse,
 } from "../../utils/types";
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
+import { AuthRoles } from "../../utils/Permissions/determineUserPermissions";
 
 function QueuePage() {
   const {
@@ -52,13 +54,17 @@ function QueuePage() {
   const [user] = useAuthState(auth);
   const [queueItems, setQueueItems] = useState<Job[]>([]);
   const [printerItems, setPrinterItems] = useState<Printer[]>([]);
+  const { authorizationRole } = useAuthorization();
 
   const [fetching, setFetching] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [update, setUpdate] = useState<boolean>(true);
 
   useEffect(() => {
-    const url = "http://localhost:3232/qHandle?command=getState";
+    // const url =
+    //   "https://bdw-printer-queue.onrender.com/qHandle?command=getState";
+    const url =
+      "https://bdw-printer-queue.onrender.com/qHandle?command=getState";
     const fetchData = async () => {
       setFetching(true);
       try {
@@ -86,7 +92,7 @@ function QueuePage() {
   }, [update]);
 
   const handleJoinQueue = () => {
-    if (user === null) {
+    if (user === null || authorizationRole == AuthRoles.viewer) {
       onOpenAlertModal();
     } else {
       onOpenJoinQueueModal();
@@ -156,12 +162,7 @@ function QueuePage() {
                 </HStack>
                 <Flex flexWrap="wrap">
                   {printerItems.map((printer) => (
-                    <SmallPrinterCard
-                      key={printer.name}
-                      name={printer.name}
-                      status={printer.status}
-                      timeStarted={printer.timeStarted}
-                    />
+                    <SmallPrinterCard key={printer.name} printer={printer} />
                   ))}
                 </Flex>
               </GridItem>
@@ -192,6 +193,7 @@ function QueuePage() {
                             job={{ ...printer.currentJob }}
                             printer={printer}
                             setUpdate={setUpdate}
+                            img={printer.currentJob.imgUrl}
                           />
                         );
                       }
@@ -202,6 +204,7 @@ function QueuePage() {
                           key={job.JobID}
                           job={{ ...job }}
                           setUpdate={setUpdate}
+                          img={job.imgUrl}
                         />
                       );
                     })}
@@ -214,11 +217,6 @@ function QueuePage() {
         <JoinQueueModal
           onClose={onCloseJoinQueueModal}
           isOpen={isOpenJoinQueueModal}
-          username={
-            user?.displayName === null || user?.displayName === undefined
-              ? "anonymous"
-              : user.displayName
-          }
           setUpdate={setUpdate}
         />
         <AlertModal onClose={onCloseAlertModal} isOpen={isOpenAlertModal} />

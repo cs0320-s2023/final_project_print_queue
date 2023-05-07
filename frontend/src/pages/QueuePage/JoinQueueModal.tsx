@@ -1,10 +1,14 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
+  CloseButton,
   Container,
-  FormControl,
-  FormLabel,
   HStack,
+  Heading,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,6 +17,8 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  VStack,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -25,55 +31,29 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../utils/firebase";
 import FileUpload from "../../components/FileUpload";
+import { InfoIcon } from "@chakra-ui/icons";
 
 interface QueueModalProps {
   onClose: () => void;
   isOpen: boolean;
-  username: string;
   setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export interface FormState {
-  projectName: string;
-  printTime: string;
-  printerPreference: string;
-  contact: string;
-}
+const baseurl =
+  "https://bdw-printer-queue.onrender.com/qHandle?command=enqueue&";
 
-const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
-
-function JoinQueueModal({
-  onClose,
-  isOpen,
-  username,
-  setUpdate,
-}: QueueModalProps) {
+function JoinQueueModal({ onClose, isOpen, setUpdate }: QueueModalProps) {
   const [user] = useAuthState(auth);
-  const [contactState, setContactState] = useState("email");
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [printTime, setPrintTime] = useState<string>("");
   const toast = useToast();
-
-  const [formState, setFormState] = useState<FormState>({
-    projectName: "",
-    printTime: "",
-    printerPreference: "",
-    contact: "",
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFormState({
-      ...formState,
-      [e.target.name]: value,
-    });
-  };
 
   const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
     const url =
       baseurl +
-      `user=${user?.displayName}&contact=${user?.email}&duration=${formState.printTime}`;
+      `user=${user?.displayName}&contact=${user?.email}&imgUrl=${user?.photoURL}&duration=${printTime}`;
 
     const enqueueResponse = await enqueue(url);
-    console.log(enqueueResponse);
     if (enqueueResponse !== undefined) {
       if (enqueueResponse.result === "success") {
         toast({
@@ -91,6 +71,7 @@ function JoinQueueModal({
         });
       }
     }
+    setFileUploaded(false);
     setUpdate(true);
     onClose();
   };
@@ -99,46 +80,44 @@ function JoinQueueModal({
     <Modal onClose={onClose} size="xl" isOpen={isOpen}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Join the Queue 🎉</ModalHeader>
+        <ModalHeader pt={5}>
+          <Heading>Join the Queue</Heading>
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
-            To join the queue please upload you .gcode file from the PrusaSlicer
-            in the area below. Please be aware that we do not store or save your
-            .gcode file for you! We ask you to upload your file so we can
-            extract the estimated print time of your project to better manage
-            the queue on our end. Happy Printinting!
-          </Text>
-          {/* <FormControl>
-              <FormLabel>Project Name</FormLabel>
-              <Input
-                placeholder="My 3D Printing Project"
-                onChange={handleInputChange}
-              />
-            </FormControl> */}
+          <VStack alignItems="start">
+            <DisclaimerBox />
+            <Text>
+              To join the queue please upload you .gcode file from the
+              PrusaSlicer in the area below.
+            </Text>
+          </VStack>
           <Container py={5}>
-            <FileUpload formState={formState} setFormState={setFormState} />
+            <FileUpload
+              setPrintTime={setPrintTime}
+              fileUploaded={fileUploaded}
+              setFileUploaded={setFileUploaded}
+            />
           </Container>
-          {/* <Box justifyItems="start" justifyContent="start">
-              <Heading size="md:" py={3}>
-                <Text>Contact Preference</Text>
-              </Heading>
-              <RadioGroup onChange={setContactState} value={contactState}>
-                <HStack>
-                  <Radio value="email">Email</Radio>
-                  <Radio value="text">Text</Radio>
-                  <Radio value="both">Both</Radio>
-                </HStack>
-              </RadioGroup>
-            </Box> */}
         </ModalBody>
         <ModalFooter>
           <HStack>
-            <Button colorScheme="orange" variant="solid" onClick={handleSubmit}>
+            <Button
+              colorScheme="orange"
+              variant="solid"
+              onClick={handleSubmit}
+              isDisabled={!fileUploaded}
+            >
               Submit
             </Button>
-            <Button onClick={onClose} variant="ghost">
-              Close
+            <Button
+              onClick={() => {
+                onClose();
+                setFileUploaded(false);
+              }}
+              variant="ghost"
+            >
+              Cancel
             </Button>
           </HStack>
         </ModalFooter>
@@ -176,3 +155,35 @@ const enqueue = async (url: string) => {
     return { result: "error" };
   }
 };
+
+function DisclaimerBox() {
+  const {
+    isOpen: isVisible,
+    onClose,
+    onOpen,
+  } = useDisclosure({ defaultIsOpen: true });
+
+  return isVisible ? (
+    <Alert status="info">
+      <AlertIcon />
+      <Box>
+        <AlertTitle>File Upload Usage</AlertTitle>
+        <AlertDescription>
+          Please be aware that we do not store or save your .gcode file for you.
+          We ask you to upload your file so we can extract the estimated print
+          time of your project to better manage the queue on our end. Happy
+          Printinting!
+        </AlertDescription>
+      </Box>
+      <CloseButton
+        alignSelf="flex-start"
+        position="relative"
+        right={-1}
+        top={-1}
+        onClick={onClose}
+      />
+    </Alert>
+  ) : (
+    <InfoIcon color={"blue.400"} onClick={onOpen} />
+  );
+}

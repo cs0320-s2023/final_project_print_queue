@@ -1,4 +1,5 @@
 import image1 from "../assets/printer1.png";
+import { Link as ReactRouterLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   Text,
   VStack,
   Button,
+  Link,
 } from "@chakra-ui/react";
 import printer1 from "../assets/printer1.jpg";
 import printer2 from "../assets/printer2.jpg";
@@ -18,6 +20,7 @@ import printer6 from "../assets/printer6.jpg";
 import printer7 from "../assets/printer7.jpg";
 import printer8 from "../assets/printer8.jpg";
 import printer9 from "../assets/printer9.jpg";
+import { Status } from "../utils/types";
 
 interface IndividualCard {
   image: string;
@@ -33,32 +36,33 @@ interface IndividualPrinterProps {
 function IndividualPrinter({ name, status, filament }: IndividualCard) {
   console.log(name);
   const renderStatus = () => {
+    console.log(status);
     switch (status) {
-      case "available":
+      case Status.AVAILABLE:
         return (
           <Text fontWeight="bold" color="green.600">
             Available
           </Text>
         );
-      case "busy":
+      case Status.BUSY:
         return (
-          <Text fontWeight="bold" color="yellow.600">
+          <Text fontWeight="bold" color="red.600">
             Busy
           </Text>
         );
-      case "pending":
+      case Status.PENDING:
         return (
           <Text fontWeight="bold" color="yellow.600">
             Pending
           </Text>
         );
-      case "maintenance":
+      case Status.MAINTENANCE:
         return (
-          <Text fontWeight="bold" color="red.500">
+          <Text fontWeight="bold" color="purple.600">
             Maintenace
           </Text>
         );
-      case "reserved":
+      case Status.RESERVED:
         return (
           <Text fontWeight="bold" color="orange.300">
             Reserved
@@ -85,6 +89,18 @@ function IndividualPrinter({ name, status, filament }: IndividualCard) {
     "Printer 9": printer9,
   };
 
+  const nameToName: { [name: string]: string } = {
+    p1: "Printer 1",
+    p2: "Printer 2",
+    p3: "Printer 3",
+    p4: "Printer 4",
+    p5: "Printer 5",
+    p6: "Printer 6",
+    p7: "Printer 7",
+    p8: "Printer 8",
+    p9: "Printer 9",
+  };
+
   return (
     <div>
       <VStack justifyContent="space-between" alignItems="left">
@@ -94,7 +110,7 @@ function IndividualPrinter({ name, status, filament }: IndividualCard) {
           style={{ width: "350px", height: "250px" }}
         />
         <Heading as="h1" size="md" fontWeight="bold" color="blackAlpha.700">
-          {name}
+          <p style={{ fontWeight: "bold" }}>{nameToName[name]}</p>
         </Heading>
         <Text color="blackAlpha.700" fontWeight="bold">
           Status: {renderStatus()}
@@ -102,7 +118,7 @@ function IndividualPrinter({ name, status, filament }: IndividualCard) {
         <Text color="blackAlpha.700" fontWeight="bold">
           Filament Color: {filament}
         </Text>
-        <Button colorScheme="orange" size="md" onClick={() => onOpen()}>
+        <Button colorScheme="orange" size="md" as={ReactRouterLink} to="/queue">
           Claim Printer Now
         </Button>
       </VStack>

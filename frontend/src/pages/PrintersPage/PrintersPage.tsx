@@ -1,4 +1,5 @@
 import { flexbox, VStack } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { Flex, Spacer } from "@chakra-ui/react";
 import {
   Box,
@@ -18,8 +19,49 @@ import {
 import { Link } from "react-router-dom";
 import PrinterCard from "../../components/PrinterCard";
 import printers from "../../Mocks/PrinterMocks";
+import {
+  GetStateServerResponse,
+  Job,
+  Printer,
+  ServerErrorResponse,
+  isGetStateServerResponse,
+  isServerErrorResponse,
+} from "../../utils/types";
 
 export default function PrintersPage() {
+  const [printerItems, setPrinterItems] = useState<Printer[]>([]);
+
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [update, setUpdate] = useState<boolean>(true);
+
+  useEffect(() => {
+    const url =
+      "https://bdw-printer-queue.onrender.com/qHandle?command=getState";
+    const fetchData = async () => {
+      setFetching(true);
+      try {
+        const response = await fetch(url);
+        const responseJson: GetStateServerResponse | ServerErrorResponse =
+          await response.json();
+        if (isGetStateServerResponse(responseJson)) {
+          setPrinterItems(responseJson.printers);
+        } else if (isServerErrorResponse(responseJson)) {
+          setError(true);
+        } else {
+          console.log(
+            "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
+          );
+        }
+      } catch (error) {
+        setError(true);
+        console.log(error);
+      }
+      setFetching(false);
+    };
+    fetchData();
+    setUpdate(false);
+  }, [update]);
   return (
     <Grid
       gridTemplateRows={"auto auto"}
@@ -49,16 +91,16 @@ export default function PrintersPage() {
       </GridItem>
       <GridItem gridColumn={"1/4"}>
         <Flex flex-grow="1" flexWrap="wrap" gap="25px" padding="10">
-          {printers.map((printer) => {
+          {printerItems.map((printer) => {
+            console.log(printer.name);
             return (
               <Link
-                to={`/printer/${printer.id}`}
-                key={printer.id}
+                to={`/printer/${printer.name}`}
+                key={printer.name}
                 state={printer}
               >
                 <PrinterCard
-                  id={printer.id}
-                  image={printer.image}
+                  id={printer.name}
                   name={printer.name}
                   status={printer.status}
                   timeStarted={printer.timeStarted}

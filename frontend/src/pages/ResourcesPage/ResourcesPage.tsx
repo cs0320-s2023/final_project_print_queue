@@ -1,5 +1,7 @@
 import { flexbox, VStack } from "@chakra-ui/react";
 import { Flex, Spacer } from "@chakra-ui/react";
+import poster from "../../assets/poster.jpg";
+
 import {
   Box,
   Button,
@@ -23,10 +25,10 @@ function ResourcesPage() {
       gridTemplateColumns={"1fr 1fr 1fr"}
       gap="1"
     >
-      <GridItem gridColumn={"1/3"}>
+      <GridItem gridColumn={"1/4"}>
         <Stack align={"left"} py={6} px={12}>
           <Heading
-            fontWeight={600}
+            fontWeight={400}
             fontSize={{ base: "3xl", sm: "4xl", lg: "6xl" }}
           >
             Resource Page
@@ -59,6 +61,13 @@ function ResourcesPage() {
             open, your print will be cancelled by the monitors on opening shift.
           </Text>
         </Stack>
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <img
+            src={poster}
+            alt="Poster"
+            style={{ width: "700px", height: "500px" }}
+          />
+        </Box>
       </GridItem>
     </Grid>
   );

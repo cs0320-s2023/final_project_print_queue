@@ -87,7 +87,7 @@ const printers: Printer[] = [
   {
     name: "Printer 8",
     filament: "Red",
-    status: Status.RESERVE,
+    status: Status.RESERVED,
     timeStarted: "01:23:00",
   },
 ];

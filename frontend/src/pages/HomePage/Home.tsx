@@ -1,4 +1,5 @@
 import "./Home.css";
+import { Link as ReactRouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -11,6 +12,7 @@ import {
   Stack,
   Text,
   VStack,
+  Image,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -74,23 +76,14 @@ function HomePage() {
                     colorScheme="orange"
                     size="md"
                     left="105px"
-                    onClick={() => onOpen()}
+                    as={ReactRouterLink}
+                    to="/auth/login"
                   >
                     Signup Today
                   </Button>
                 </VStack>
               </GridItem>
             </Grid>
-            <p>Everyone Can see</p>
-            <Restricted to={PermissionValues.delete}>
-              <p>Admin Can see</p>
-            </Restricted>
-            <Restricted to={PermissionValues.dev}>
-              <p>Dev Permission</p>
-            </Restricted>
-            <Restricted to={PermissionValues.add}>
-              <p>Authenticated Can see</p>
-            </Restricted>
           </div>
         </PermissionsProvider>
       )}

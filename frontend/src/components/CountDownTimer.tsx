@@ -46,7 +46,6 @@ function CountDownTimer({ printer }: CountDownTimerProps) {
           />
         );
       } else {
-        console.log("IN here");
         return (
           <Countdown
             date={momentObject

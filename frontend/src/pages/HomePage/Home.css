@@ -1,0 +1,60 @@
+/* Maximize your 3D printing experience at the Brown Design Workshop with PrintQ */
+
+
+  
+  /* PrintQ allows you to secure your spot in our 3D printing queue to avoid any uncertainty about when its your turn to print. */
+  
+  .my-other-class {
+    position: absolute;
+    width: 845px;
+    height: 88px;
+    left: 105px;
+    top: 538px;
+  
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 29px;
+  }
+
+    /* Ellipse 1 */
+  
+    .ellipse-1 {
+        position: absolute;
+        width: 589px;
+        height: 589px;
+        left: 1022px;
+        top: 300px;
+        border-radius: 50%;
+        background: #FF7B15;
+      }
+  
+  /* Ellipse 3 */
+  
+  .ellipse-3 {
+    position: absolute;
+    width: 87px;
+    height: 91px;
+    left: 883px;
+    top: 100px;
+    border-radius: 50%;
+  
+    background: #FF7B15;
+  }
+  
+
+  
+  /* Ellipse 2 */
+  
+  .ellipse-2 {
+    position: absolute;
+    width: 198px;
+    height: 208px;
+    left: 0px;
+    top: 500px;
+    border-radius: 50%;
+  
+    background: #FF7B15;
+  }
+  

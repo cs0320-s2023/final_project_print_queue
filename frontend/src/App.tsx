@@ -16,6 +16,7 @@ import {
   PermissionsProvider,
 } from "./utils/Permissions/PermissionProvider";
 import { ProtectedRoute } from "./components/ProtectedRute";
+import IndividualPrinterPage from "./pages/PrintersPage/IndividualPrinterPage";
 import AdminDashboard from "./pages/AdminPage/AdminDash";
 
 function App() {
@@ -30,6 +31,10 @@ function App() {
                 <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/queue" element={<QueuePage />} />
                 <Route path="/printers" element={<PrintersPage />} />
+                <Route
+                  path="/printer/:id"
+                  element={<IndividualPrinterPage />}
+                />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/auth/login" element={<Login />} />
                 <Route

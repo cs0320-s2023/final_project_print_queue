@@ -22,11 +22,14 @@ import {
 } from "../../utils/Permissions/PermissionProvider";
 
 import Restricted from "../../utils/Permissions/Restricted";
-import { useAuthorization } from "../../utils/hooks/useAuthorization";
 import { determineUserRole } from "../../utils/Permissions/determineUserPermissions";
+import { auth } from "../../utils/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useAuthorization } from "../../utils/hooks/useAuthorization";
 
 function HomePage() {
   const { authorizationRole } = useAuthorization();
+  const [user, loading] = useAuthState(auth);
   console.log(authorizationRole);
 
   return (
@@ -77,7 +80,7 @@ function HomePage() {
                     size="md"
                     left="105px"
                     as={ReactRouterLink}
-                    to="/auth/login"
+                    to={user ? "/profile" : "/auth/login"}
                   >
                     Signup Today
                   </Button>

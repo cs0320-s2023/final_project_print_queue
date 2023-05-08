@@ -23,7 +23,6 @@ import printer9 from "../assets/printer9.jpg";
 import { Status } from "../utils/types";
 
 interface IndividualCard {
-  image: string;
   name: string;
   status: string;
   filament: string;
@@ -105,21 +104,37 @@ function IndividualPrinter({ name, status, filament }: IndividualCard) {
     <div>
       <VStack justifyContent="space-between" alignItems="left">
         <Image
-          src={imageStatus[name]}
+          src={imageStatus[nameToName[name]]}
           alt={name}
-          style={{ width: "350px", height: "250px" }}
+          style={{ width: "500px", height: "400px" }}
         />
-        <Heading as="h1" size="md" fontWeight="bold" color="blackAlpha.700">
+        <Heading as="h1" size="lg" fontWeight="bold" color="blackAlpha.900">
           <p style={{ fontWeight: "bold" }}>{nameToName[name]}</p>
         </Heading>
-        <Text color="blackAlpha.700" fontWeight="bold">
-          Status: {renderStatus()}
+
+        <Text
+          color="blackAlpha.900"
+          fontWeight="bold"
+          fontSize="xl"
+          whiteSpace="nowrap"
+        >
+          Status:{" "}
+          <span style={{ display: "inline-block" }}>{renderStatus()}</span>
         </Text>
-        <Text color="blackAlpha.700" fontWeight="bold">
+
+        <Text color="blackAlpha.900" fontWeight="bold" fontSize="xl">
           Filament Color: {filament}
         </Text>
-        <Button colorScheme="orange" size="md" as={ReactRouterLink} to="/queue">
+        <Button colorScheme="orange" size="lg" as={ReactRouterLink} to="/queue">
           Claim Printer Now
+        </Button>
+        <Button
+          colorScheme="orange"
+          size="lg"
+          as={ReactRouterLink}
+          to="/printers"
+        >
+          Back to Printers Page
         </Button>
       </VStack>
     </div>

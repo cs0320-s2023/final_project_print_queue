@@ -16,8 +16,8 @@ import {
   PermissionsProvider,
 } from "./utils/Permissions/PermissionProvider";
 import { ProtectedRoute } from "./components/ProtectedRute";
-import AdminDashboard from "./pages/AdminDash";
 import IndividualPrinterPage from "./pages/PrintersPage/IndividualPrinterPage";
+import AdminDashboard from "./pages/AdminPage/AdminDash";
 
 function App() {
   return (

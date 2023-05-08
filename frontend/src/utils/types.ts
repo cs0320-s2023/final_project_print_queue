@@ -1,12 +1,10 @@
 export interface Job {
-  uid: string; // Has not been added yet.
   user: string;
   contact: string;
   printTime: string;
   timeQueued: string;
-  // status: string;
-  JobID: string; // This feild hasn't yet been added
-  // printer:
+  JobID: string;
+  imgUrl: string;
 }
 
 export interface Printer {
@@ -22,7 +20,7 @@ export enum Status {
   BUSY = "BUSY",
   PENDING = "PENDING",
   MAINTENANCE = "MAINTENANCE",
-  RESERVE = "RESERVE",
+  RESERVED = "RESERVED",
 }
 
 /**
@@ -107,14 +105,16 @@ export function isRejectPrinterServerResponse(
  */
 export interface RejectFromQueueServerResponse {
   result: string;
-  message: string;
+  contact: string;
+  user: string;
 }
 
 export function isRejectFromQueueServerResponse(
   rjson: any
 ): rjson is RejectFromQueueServerResponse {
   if (!("result" in rjson)) return false;
-  if (!("message" in rjson)) return false;
+  if (!("contact" in rjson)) return false;
+  if (!("user" in rjson)) return false;
   return true;
 }
 
@@ -132,5 +132,21 @@ export function isClaimPrinterServerResponse(
 ): rjson is RejectFromQueueServerResponse {
   if (!("result" in rjson)) return false;
   if (!("message" in rjson)) return false;
+  return true;
+}
+
+/**
+ * UpdatePrinterServerResponse Type and corresponding type gaurd funciton for
+ * checking if a given object is a rejectPrinterServerResponse
+ */
+export interface UpdatePrinterServerResponse {
+  result: string;
+  message?: string;
+}
+
+export function isUpdatePrinterServerResponse(
+  rjson: any
+): rjson is RejectFromQueueServerResponse {
+  if (!("result" in rjson)) return false;
   return true;
 }

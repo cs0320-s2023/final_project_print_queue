@@ -1,5 +1,7 @@
 package queueclasses;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import org.jetbrains.annotations.Nullable;
 
 public class Printer {
@@ -57,6 +59,14 @@ public class Printer {
   public void setCurrentJob(Job currentJob) {
     this.currentJob = currentJob;
   }
+
+  /**
+   * getter for currentJob
+   * @return the current job
+   */
+  public Job getCurrentJob() {
+    return this.currentJob;
+  }
   /**
    * setter for the timeStarted parameter
    *
@@ -64,6 +74,14 @@ public class Printer {
    */
   public void setTimeStarted(String time) {
     this.timeStarted = time;
+  }
+
+  /**
+   *
+   * @return the time started as a localTime object
+   */
+  public LocalTime getTimeStarted(){
+    return LocalTime.parse(this.timeStarted);
   }
 
   /**

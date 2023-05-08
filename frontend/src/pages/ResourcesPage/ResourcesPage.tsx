@@ -31,7 +31,7 @@ function ResourcesPage() {
             fontWeight={400}
             fontSize={{ base: "3xl", sm: "4xl", lg: "6xl" }}
           >
-            Resource Page
+            Resource <span style={{ color: "#FF7B15" }}>Page</span>
           </Heading>
 
           <Text>

@@ -49,7 +49,7 @@ function CountDownTimer({
       if (printer.status == Status.PENDING) {
         return (
           <Countdown
-            date={timestamp.subtract(4, "hours").add(5, "seconds").toDate()}
+            date={timestamp.subtract(4, "hours").add(5, "minutes").toDate()}
             overtime={true}
             onComplete={() => {
               setJobFinished(true);

@@ -4,9 +4,6 @@ import { Printer, Status } from "../../utils/types";
 import CountDownTimer from "../../components/CountDownTimer";
 
 interface SmallPrinterProps {
-  // name: string;
-  // status: Status;
-  // timeStarted: string;
   printer: Printer;
 }
 
@@ -29,7 +26,13 @@ function SmallPrinterCard({ printer }: SmallPrinterProps) {
       case Status.MAINTENANCE:
         return <Text color="purple.600">Maintenance</Text>;
       case Status.BUSY:
-        return <CountDownTimer printer={printer} />;
+        return (
+          <CountDownTimer
+            printer={printer}
+            setUpdate={() => {}}
+            setJobFinished={() => {}}
+          />
+        );
       case Status.RESERVED:
         return <Text color="red.600">Reserved</Text>;
       case Status.PENDING:

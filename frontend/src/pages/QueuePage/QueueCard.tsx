@@ -19,7 +19,6 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import Countdown, { zeroPad } from "react-countdown";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useAuthorization } from "../../utils/hooks/useAuthorization";
 import { AuthRoles } from "../../utils/Permissions/determineUserPermissions";
@@ -33,20 +32,14 @@ import {
   RejectPrinterServerResponse,
   ServerErrorResponse,
   Status,
+  TimerProps,
   isClaimPrinterServerResponse,
   isRejectFromQueueServerResponse,
   isRejectPrinterServerResponse,
   isServerErrorResponse,
 } from "../../utils/types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CountDownTimer from "../../components/CountDownTimer";
-
-interface TimerProps {
-  hours: number;
-  minutes: number;
-  seconds: number;
-  completed: boolean;
-}
 
 interface QueueCardProps {
   job: Job;
@@ -56,14 +49,14 @@ interface QueueCardProps {
 }
 
 function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
-  const moment = require("moment");
-
   const [user] = useAuthState(auth);
   const { authorizationRole } = useAuthorization();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
+  const [jobFinished, setJobFinished] = useState<boolean>(false);
 
   const handleDelete = async () => {
+    // let url = "http://localhost:3232/";
     let url = "https://bdw-printer-queue.onrender.com/";
 
     if (printer) {
@@ -91,7 +84,7 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
       } else {
         console.log(responseJson);
         console.log(
-          "Error: Json returned is not of type EnqueueServerResponse or ServerErrorResponse"
+          "Error: Json returned is not of type RejectFromQueueServerResponse or RejectPrinterServerResponse or ServerErrorResponse"
         );
       }
     } catch (error) {
@@ -101,13 +94,14 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
 
   const handleConfirmPrintStart = async () => {
     if (printer) {
+      // let url = `http://localhost:3232/qHandle?command=claim&printerName=${printer.name}`;
+
       let url = `https://bdw-printer-queue.onrender.com/qHandle?command=claim&printerName=${printer.name}`;
       try {
         const response = await fetch(url);
         const responseJson: ClaimPrinterServerResponse | ServerErrorResponse =
           await response.json();
         if (isClaimPrinterServerResponse(responseJson)) {
-          console.log(responseJson);
           setUpdate(true);
           return responseJson;
         } else if (isServerErrorResponse(responseJson)) {
@@ -124,45 +118,53 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
     }
   };
 
-  // const renderer = ({ hours, minutes, seconds, completed }: TimerProps) => {
-  //   if (completed) {
-  //     // Render a completed state
-  //     return <Text>Completed</Text>;
-  //   } else {
-  //     // Render a countdown
-  //     return (
-  //       <span>
-  //         {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
-  //       </span>
-  //     );
-  //   }
-  // };
+  const renderCardHeader = () => {
+    return (
+      <HStack justifyContent="space-between">
+        <HStack spacing={4}>
+          {user?.displayName ? (
+            <Avatar size="md" name={user.displayName} src={img} />
+          ) : (
+            <Avatar size="md" name="" src={img} />
+          )}
+          <Heading size="md">{job.user}</Heading>
+        </HStack>
+        {authorizationRole === AuthRoles.admin ||
+        user?.email === job.contact ? (
+          <Button
+            colorScheme="red"
+            variant="ghost"
+            leftIcon={<DeleteIcon />}
+            onClick={onOpen}
+          >
+            Delete
+          </Button>
+        ) : (
+          ""
+        )}
+      </HStack>
+    );
+  };
 
   const renderCardFooter = () => {
     if (printer && printer.currentJob?.printTime) {
-      // const momentObject = moment(printer.timeStarted, "HH:mm:ss");
-
       switch (printer.status) {
         case Status.BUSY:
-          // let busyEndtime = momentObject
-          //   .add(printer.currentJob.printTime, "seconds")
-          //   .utc()
-          //   .format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
-                Job in Progress...
+                {jobFinished ? "Job finished" : "Job in Progress..."}
               </Text>
-              {/* <Box w="100px">
-                <Countdown date={busyEndtime} renderer={renderer} />
-              </Box> */}
               <Box>
-                <CountDownTimer printer={printer} />
+                <CountDownTimer
+                  printer={printer}
+                  setUpdate={setUpdate}
+                  setJobFinished={setJobFinished}
+                />
               </Box>
             </HStack>
           );
         case Status.PENDING:
-          // let pendingEndtime = momentObject.add(5, "minutes").utc().format();
           return (
             <HStack spacing="4" justifyContent="space-between">
               <Text fontSize="md" fontWeight="400">
@@ -170,17 +172,21 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
               </Text>
               <HStack spacing="5" justifyContent="space-evenly">
                 {(printer.currentJob.contact === user?.email ||
-                  authorizationRole === AuthRoles.admin) && (
-                  <Button
-                    colorScheme="orange"
-                    size="md"
-                    onClick={handleConfirmPrintStart}
-                  >
-                    Confirm Print Has Started
-                  </Button>
-                )}
-                <CountDownTimer printer={printer} />
-                {/* <Countdown date={pendingEndtime} renderer={renderer} />, */}
+                  authorizationRole === AuthRoles.admin) &&
+                  !jobFinished && (
+                    <Button
+                      colorScheme="orange"
+                      size="md"
+                      onClick={handleConfirmPrintStart}
+                    >
+                      Confirm Print Has Started
+                    </Button>
+                  )}
+                <CountDownTimer
+                  printer={printer}
+                  setUpdate={setUpdate}
+                  setJobFinished={setJobFinished}
+                />
               </HStack>
             </HStack>
           );
@@ -198,71 +204,53 @@ function QueueCard({ job, printer, img, setUpdate }: QueueCardProps) {
     }
   };
 
+  const renderAlertModal = () => {
+    return (
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Job
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure? You can't undo this action afterwards.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => {
+                  handleDelete();
+                  onClose();
+                }}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    );
+  };
+
   return (
-    <Card w={"100%"}>
-      <CardHeader>
-        <HStack justifyContent="space-between">
-          <HStack spacing={4}>
-            {user?.displayName ? (
-              <Avatar size="md" name={user.displayName} src={img} />
-            ) : (
-              <Avatar size="md" name="" src={img} />
-            )}
-            <Heading size="md">{job.user}</Heading>
-          </HStack>
-          {authorizationRole === AuthRoles.admin ||
-          user?.email === job.contact ? (
-            <Button
-              colorScheme="red"
-              variant="ghost"
-              leftIcon={<DeleteIcon />}
-              onClick={onOpen}
-            >
-              Delete
-            </Button>
-          ) : (
-            ""
-          )}
-        </HStack>
-      </CardHeader>
-      <Divider color={"blackAlpha.400"} />
-      <CardBody>
-        {renderCardFooter()}
-        <AlertDialog
-          isOpen={isOpen}
-          leastDestructiveRef={cancelRef}
-          onClose={onClose}
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Delete Job
-              </AlertDialogHeader>
-
-              <AlertDialogBody>
-                Are you sure? You can't undo this action afterwards.
-              </AlertDialogBody>
-
-              <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={() => {
-                    handleDelete();
-                    onClose();
-                  }}
-                  ml={3}
-                >
-                  Delete
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
-      </CardBody>
-    </Card>
+    <>
+      <Card w={"100%"} backgroundColor={jobFinished ? "red.100" : " "}>
+        <CardHeader>{renderCardHeader()}</CardHeader>
+        <Divider color={"blackAlpha.400"} />
+        <CardBody>{renderCardFooter()}</CardBody>
+      </Card>
+      {renderAlertModal()}
+    </>
   );
 }
 

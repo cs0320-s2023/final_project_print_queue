@@ -39,6 +39,7 @@ interface QueueModalProps {
   setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// const baseurl = "http://localhost:3232/qHandle?command=enqueue&";
 const baseurl =
   "https://bdw-printer-queue.onrender.com/qHandle?command=enqueue&";
 
@@ -88,7 +89,7 @@ function JoinQueueModal({ onClose, isOpen, setUpdate }: QueueModalProps) {
           <VStack alignItems="start">
             <DisclaimerBox />
             <Text>
-              To join the queue please upload you .gcode file from the
+              To join the queue please upload your .gcode file from the
               PrusaSlicer in the area below.
             </Text>
           </VStack>

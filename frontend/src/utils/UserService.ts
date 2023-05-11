@@ -47,7 +47,6 @@ class UserDataService {
     return userExists;
   };
 
-
   update = (uid: string, updatedUser: IUser) => {
     console.log("IN UPDATE Function");
     update(ref(db, "users/" + uid), updatedUser)
@@ -63,7 +62,6 @@ class UserDataService {
     uid: string,
     setAuthorization: React.Dispatch<React.SetStateAction<string>>
   ) => {
-
     let role = get(child(usersReference, uid))
       .then((snapshot) => {
         if (snapshot.exists()) {

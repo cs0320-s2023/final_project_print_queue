@@ -1,3 +1,5 @@
+import { CountdownApi } from "react-countdown";
+
 export interface Job {
   user: string;
   contact: string;
@@ -21,6 +23,14 @@ export enum Status {
   PENDING = "PENDING",
   MAINTENANCE = "MAINTENANCE",
   RESERVED = "RESERVED",
+}
+
+export interface TimerProps {
+  hours: number;
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+  api: CountdownApi;
 }
 
 /**
@@ -59,6 +69,7 @@ export function isEnqueueServerResponse(
   if (!("contact" in rjson)) return false;
   if (!("duration" in rjson)) return false;
   if (!("result" in rjson)) return false;
+  if (!("ID" in rjson)) return false;
   return true;
 }
 

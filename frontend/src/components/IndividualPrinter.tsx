@@ -125,9 +125,9 @@ function IndividualPrinter({ name, status, filament }: IndividualCard) {
         <Text color="blackAlpha.900" fontWeight="bold" fontSize="xl">
           Filament Color: {filament}
         </Text>
-        <Button colorScheme="orange" size="lg" as={ReactRouterLink} to="/queue">
+        {/* <Button colorScheme="orange" size="lg" as={ReactRouterLink} to="/queue">
           Claim Printer Now
-        </Button>
+        </Button> */}
         <Button
           colorScheme="orange"
           size="lg"

@@ -74,7 +74,11 @@ function PrintersTable() {
           <Tbody>
             {printerItems.map((printer) => {
               return (
-                <PrinterTableRow printer={printer} setUpdate={setUpdate} />
+                <PrinterTableRow
+                  key={printer.name}
+                  printer={printer}
+                  setUpdate={setUpdate}
+                />
               );
             })}
           </Tbody>
@@ -98,14 +102,12 @@ const PrinterTableRow = ({ printer, setUpdate }: PrinterRowProps) => {
   const handleUpdate = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     const url = `https://bdw-printer-queue.onrender.com/qHandle?command=update&printer_name=${printer.name}&filament=${filament}&status=${status}`;
-    console.log(url);
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await fetch(url);
         const responseJson: UpdatePrinterServerResponse | ServerErrorResponse =
           await response.json();
-        console.log(response);
         if (isUpdatePrinterServerResponse(responseJson)) {
           toast({
             title: "Printer has been successfully updated. Please reload page.",

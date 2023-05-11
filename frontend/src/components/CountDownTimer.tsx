@@ -1,6 +1,7 @@
 import Countdown, { zeroPad } from "react-countdown";
 import { Printer, Status } from "../utils/types";
 import { Text } from "@chakra-ui/react";
+import { useState } from "react";
 
 interface TimerProps {
   hours: number;
@@ -11,13 +12,25 @@ interface TimerProps {
 
 interface CountDownTimerProps {
   printer: Printer;
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
+  setJobFinished: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function CountDownTimer({ printer }: CountDownTimerProps) {
+function CountDownTimer({
+  printer,
+  setUpdate,
+  setJobFinished,
+}: CountDownTimerProps) {
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+
   const renderer = ({ hours, minutes, seconds, completed }: TimerProps) => {
     if (completed) {
       // Render a completed state
-      return <Text>Completed</Text>;
+      return (
+        <span style={{ color: isCompleted ? "red" : "" }}>
+          -{zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+        </span>
+      );
     } else {
       // Render a countdown
       return (
@@ -30,28 +43,31 @@ function CountDownTimer({ printer }: CountDownTimerProps) {
 
   const renderCounter = () => {
     const moment = require("moment");
-    const momentObject = moment(printer.timeStarted, "HH:mm:ss");
-    momentObject.subtract(4, "hours"); // Time difference of server deployed region.
+    const timestamp = moment(printer.timeStarted, "HH:mm:ss.SSSSSSSSS");
 
     if (printer.currentJob?.printTime) {
-      // let busyEndtime = momentObject;
       if (printer.status == Status.PENDING) {
-        // use custom delay time if user provided it
-        console.log("Included Delay");
-        // let pendingEndtime = momentObject.add(5, "minutes").utc().format();
         return (
           <Countdown
-            date={momentObject.add(5, "minutes").utc().format()}
+            date={timestamp.subtract(4, "hours").add(5, "seconds").toDate()}
+            overtime={true}
+            onComplete={() => {
+              setJobFinished(true);
+            }}
             renderer={renderer}
           />
         );
       } else {
         return (
           <Countdown
-            date={momentObject
+            date={timestamp
+              .subtract(4, "hours")
               .add(printer.currentJob.printTime, "seconds")
-              .utc()
-              .format()}
+              .toDate()}
+            overtime={true}
+            onComplete={() => {
+              setJobFinished(true);
+            }}
             renderer={renderer}
           />
         );
@@ -61,7 +77,7 @@ function CountDownTimer({ printer }: CountDownTimerProps) {
     }
   };
 
-  return renderCounter();
+  return <div>{renderCounter()} </div>;
 }
 
 export default CountDownTimer;

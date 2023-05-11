@@ -46,9 +46,9 @@ function Login() {
       let userAlreadyExists = await UserService.exists(result.user.uid);
       if (!userAlreadyExists) {
         // Creates new user and adds them to firebase auth
-        UserDataService.create(user, result.user.uid);
+        await UserDataService.create(user, result.user.uid);
         // Sync Authorization Context with current Users Auth Role
-        UserDataService.syncUserAuthorizationRole(
+        await UserDataService.syncUserAuthorizationRole(
           result.user.uid,
           setAuthorizationRole
         );

@@ -61,8 +61,18 @@ function FileUpload({
         reader.readAsText(file);
         reader.addEventListener("load", (e) => {
           if (e.target !== null) {
-            setPrintTime(extractPrintTime(e.target.result));
-            setFileUploaded(true);
+            let printTime = extractPrintTime(e.target.result);
+            setPrintTime(printTime);
+            if (printTime === "") {
+              toast({
+                title: `Could not extract estimated print time. Please check your file is a valid .gcode file from Prusa Slicer`,
+                position: "top",
+                status: "error",
+                isClosable: true,
+              });
+            } else {
+              setFileUploaded(true);
+            }
           } else {
             toast({
               title: `Could Not Read File: Please try uploading again.`,

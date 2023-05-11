@@ -8,7 +8,6 @@ import {
   GridItem,
   HStack,
   Heading,
-  Spinner,
   Stack,
   Text,
   VStack,
@@ -18,7 +17,7 @@ import {
 // Assets Imports
 import { FaUserCircle } from "react-icons/fa";
 import EmptyQueueAnimation from "./EmptyAnimation";
-
+import loading from "../../assets/loading.json";
 // Components
 import SmallPrinterCard from "./SmallPrinterCard";
 import QueueCard from "./QueueCard";
@@ -37,6 +36,7 @@ import {
 } from "../../utils/types";
 import { useAuthorization } from "../../utils/hooks/useAuthorization";
 import { AuthRoles } from "../../utils/Permissions/determineUserPermissions";
+import Lottie from "react-lottie";
 
 function QueuePage() {
   const {
@@ -61,8 +61,7 @@ function QueuePage() {
   const [update, setUpdate] = useState<boolean>(true);
 
   useEffect(() => {
-    // const url =
-    //   "https://bdw-printer-queue.onrender.com/qHandle?command=getState";
+    // const url = "http://localhost:3232/qHandle?command=getState";
     const url =
       "https://bdw-printer-queue.onrender.com/qHandle?command=getState";
     const fetchData = async () => {
@@ -92,7 +91,7 @@ function QueuePage() {
   }, [update]);
 
   const handleJoinQueue = () => {
-    if (user === null || authorizationRole == AuthRoles.viewer) {
+    if (authorizationRole === AuthRoles.viewer) {
       onOpenAlertModal();
     } else {
       onOpenJoinQueueModal();
@@ -101,6 +100,18 @@ function QueuePage() {
 
   if (error) {
     return <EmptyQueueAnimation />;
+  }
+
+  if (fetching) {
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: loading,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice",
+      },
+    };
+    return <Lottie options={defaultOptions} height={400} width={400} />;
   }
 
   return (
@@ -135,84 +146,74 @@ function QueuePage() {
               </Text>
             </Stack>
           </GridItem>
-          {fetching ? (
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="xl"
-            />
-          ) : (
-            <>
-              <GridItem gridColumn={"1 / 2"}>
-                <Heading as="h2" size="lg">
-                  <Text>About</Text>
-                </Heading>
-                <HStack py={2}>
-                  <FaUserCircle size="40px" />
-                  <Text>
-                    {/* Hack to get # of current users. This was caused by a backend implementation decision were users
+          <>
+            <GridItem gridColumn={"1 / 2"}>
+              <Heading as="h2" size="lg">
+                <Text>About</Text>
+              </Heading>
+              <HStack py={2}>
+                <FaUserCircle size="40px" />
+                <Text>
+                  {/* Hack to get # of current users. This was caused by a backend implementation decision were users
                       who are "Printing" are no longer stored in our Queue Data Stucture.*/}
-                    {queueItems.length +
-                      printerItems.filter((printer) => printer.currentJob)
-                        .length}{" "}
-                    people
-                  </Text>
-                </HStack>
-                <Flex flexWrap="wrap">
-                  {printerItems.map((printer) => (
-                    <SmallPrinterCard key={printer.name} printer={printer} />
-                  ))}
-                </Flex>
-              </GridItem>
-              <GridItem gridColumn={"2 / 4"}>
-                <HStack justify={"space-between"} pb={4}>
-                  <Heading as="h2" size="lg">
-                    <Text>Queue</Text>
-                  </Heading>
-                  <Button
-                    colorScheme="orange"
-                    size="md"
-                    onClick={handleJoinQueue}
-                  >
-                    Join Queue
-                  </Button>
-                </HStack>
-                {queueItems.length === 0 &&
-                printerItems.filter((printer) => printer.currentJob).length ===
-                  0 ? (
-                  <EmptyQueueAnimation />
-                ) : (
-                  <VStack spacing={4}>
-                    {printerItems.map((printer) => {
-                      if (printer.currentJob) {
-                        return (
-                          <QueueCard
-                            key={printer.currentJob.JobID}
-                            job={{ ...printer.currentJob }}
-                            printer={printer}
-                            setUpdate={setUpdate}
-                            img={printer.currentJob.imgUrl}
-                          />
-                        );
-                      }
-                    })}
-                    {queueItems.map((job) => {
+                  {queueItems.length +
+                    printerItems.filter((printer) => printer.currentJob)
+                      .length}{" "}
+                  people
+                </Text>
+              </HStack>
+              <Flex flexWrap="wrap">
+                {printerItems.map((printer) => (
+                  <SmallPrinterCard key={printer.name} printer={printer} />
+                ))}
+              </Flex>
+            </GridItem>
+            <GridItem gridColumn={"2 / 4"}>
+              <HStack justify={"space-between"} pb={4}>
+                <Heading as="h2" size="lg">
+                  <Text>Queue</Text>
+                </Heading>
+                <Button
+                  colorScheme="orange"
+                  size="md"
+                  onClick={handleJoinQueue}
+                >
+                  Join Queue
+                </Button>
+              </HStack>
+              {queueItems.length === 0 &&
+              printerItems.filter((printer) => printer.currentJob).length ===
+                0 ? (
+                <EmptyQueueAnimation />
+              ) : (
+                <VStack spacing={4}>
+                  {printerItems.map((printer) => {
+                    if (printer.currentJob) {
                       return (
                         <QueueCard
-                          key={job.JobID}
-                          job={{ ...job }}
+                          key={printer.currentJob.JobID}
+                          job={{ ...printer.currentJob }}
+                          printer={printer}
                           setUpdate={setUpdate}
-                          img={job.imgUrl}
+                          img={printer.currentJob.imgUrl}
                         />
                       );
-                    })}
-                  </VStack>
-                )}
-              </GridItem>
-            </>
-          )}
+                    }
+                  })}
+                  {queueItems.map((job) => {
+                    return (
+                      <QueueCard
+                        key={job.JobID}
+                        job={{ ...job }}
+                        setUpdate={setUpdate}
+                        img={job.imgUrl}
+                      />
+                    );
+                  })}
+                </VStack>
+              )}
+            </GridItem>
+          </>
         </Grid>
         <JoinQueueModal
           onClose={onCloseJoinQueueModal}

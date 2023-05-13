@@ -5,6 +5,8 @@ import "@testing-library/jest-dom";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import PrinterCard from "./components/PrinterCard";
 
+//added in two tests to make sure that the name and filament are being added properly
+
 test("all printers have a name property", () => {
   expect.assertions(printers.length);
   printers.forEach((printer: Printer) => {
